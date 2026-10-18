@@ -74,6 +74,7 @@ scope：timetable / plan / geofence / checkin / stats / auth / notification / ui
 6. 任何 agent 在完成任务后，必须更新 HANDOFF.md 的第 2、3、4、6 节；
    新增影响后续方向的决策时，必须追加到 docs/decisions.md。
 7. HANDOFF.md 只写当前状态，不写历史过程；总长度不超过 120 行。
+8. PM 与子 agent 的工作流严格遵循 docs/agent-workflow.md；PM 不得越权执行该文件第 11 节列出的不可委托事项。
 
 ## 6. 每日节奏
 - 开始：拉最新 main，开当天分支，拆 3–5 个 Qoder 子任务

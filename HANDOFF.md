@@ -67,13 +67,14 @@
 ## 9. 给新 agent 的阅读顺序
 
 1. 本文件（你正在读）
-2. README.md
-3. DEVELOPMENT.md
-4. docs/prd.md
-5. docs/decisions.md
-6. docs/qoder-tasks.md 中当前 Day 及之后的任务卡
-7. docs/design-tokens.md
-8. docs/schema.sql
+2. agent-workflow.md
+3. README.md
+4. DEVELOPMENT.md
+5. docs/prd.md
+6. docs/decisions.md
+7. docs/qoder-tasks.md 中当前 Day 及之后的任务卡
+8. docs/design-tokens.md
+9. docs/schema.sql
 
 读完不要立刻写代码，先按第 10 节模板输出你的理解与计划。
 
