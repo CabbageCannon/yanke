@@ -71,11 +71,14 @@ scope：timetable / plan / geofence / checkin / stats / auth / notification / ui
 3. 每次任务结束必须产出可运行状态，不允许半成品过夜
 4. Qoder 生成的代码必须本地跑通再 commit
 5. 依赖新增需人工确认
+6. 任何 agent 在完成任务后，必须更新 HANDOFF.md 的第 2、3、4、6 节；
+   新增影响后续方向的决策时，必须追加到 docs/decisions.md。
+7. HANDOFF.md 只写当前状态，不写历史过程；总长度不超过 120 行。
 
 ## 6. 每日节奏
 - 开始：拉最新 main，开当天分支，拆 3–5 个 Qoder 子任务
 - 开发中：每完成子任务本地验证 → commit → push
-- 收尾：lint/typecheck → 开 PR 自审 → Squash 合并 → 打 tag `v0.1.0-dN`
+- 收尾：lint/typecheck → 开 PR 自审 → **更新 HANDOFF.md 的任务快照与已知坑** → Squash 合并 → 打 tag
 - 记录：更新 GitHub Projects 看板
 
 ## 7. CI
