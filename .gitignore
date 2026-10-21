@@ -3,7 +3,12 @@ node_modules/
 dist/
 ios/
 android/
-.env
-.env.local
+.env*
+!.env.example
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+credentials.json
 *.log
 .DS_Store
