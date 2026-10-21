@@ -4,10 +4,10 @@
 每阶段主控直接更新；详情看 docs/tasks/，方向决策看 docs/decisions.md。
 
 **更新**：2026-10-21，主控 Agent
-**阶段**：第一阶段本地基础交付完成，完整 MVP 尚未交付
-**本阶段分支**：codex/chore-expo-bootstrap；合并后从 main 继续
-**本阶段PR**：[PR #2](https://github.com/CabbageCannon/yanke/pull/2)，合并与当前提交CI状态以GitHub为准
-**本地提交**：数据库ba9fb70；Expo骨架04cdcbe；产品 / 架构文档7df6593
+**阶段**：第一阶段基础已合并；本轮同步两项已确认产品规则，完整 MVP 尚未交付
+**本阶段分支**：codex/docs-checkin-rules；合并后从 main 继续
+**本轮PR**：[PR #3](https://github.com/CabbageCannon/yanke/pull/3)，规则同步；合并与当前提交CI状态以GitHub为准
+**基础交付**：[PR #2](https://github.com/CabbageCannon/yanke/pull/2)已合并为991b1bb，PR与main两项CI均通过
 **前置规范提交**：PR #1 已通过 CI，合并为 b1bb007
 **仓库**：https://github.com/CabbageCannon/yanke （公开）
 **真实云部署 / 安装包**：无
@@ -24,7 +24,8 @@ Expo58 / RN0.88 / React19.3；timegrid 精确固定0.2.2，高德模块2.3.1。
 |---|---|
 | Day 0 规范 / 授权 / SOP | 已完成，PR #1 |
 | Day 1 PRD / 架构 / 数据库基础 | 已完成，T03文档与T02数据库独立审查通过 |
-| Day 1 Expo本地骨架 | 本地验收与T01独立审查完成，远程交付见PR #2 |
+| Day 1 Expo本地骨架 | 已合并PR #2，本地验收、独立审查与远程CI完成 |
+| 产品规则补充 | 无迟到宽限、总结可选已确认；T04文档及独立审查完成 |
 | Day 1 真实Auth / 原生定位 | 尚未交付，不得用JS打包替代 |
 | Day 2 计划CRUD | 未开始 |
 | Day 3 高德选点 / 围栏 | 未开始 |
@@ -44,15 +45,15 @@ Expo58 / RN0.88 / React19.3；timegrid 精确固定0.2.2，高德模块2.3.1。
 
 ## 4. 本轮交付与保留项
 
-- T01 / T02 / T03任务卡、result与独立review已记录；本阶段主控负责提交、PR与检查后合并，远程状态以GitHub为准。
-- CI已强制npm ci / lint / typecheck / 版本检查 / Web静态导出，另有临时PGlite数据库检查job；当前提交对应结果见本阶段PR的Checks。
+- T01 / T02 / T03任务卡、result与独立review已记录，基础交付已合并PR #2；T04规则文档独立审查通过，远程状态以对应PR为准。
+- CI已强制npm ci / lint / typecheck / 版本检查 / Web静态导出，另有临时PGlite数据库检查job；当前提交对应结果见本轮PR的Checks。
 - T00审查遗留的public高德Web Key输出和无lockfile跳过CI已清理。
 - 数据库子任务来自隔离分支，已集成；临时worktree已确认干净后用git worktree remove清理，ba9fb70与本地任务分支保留。
 
-## 5. 待决 / 缺少信息
+## 5. 已确认规则 / 缺少信息
 
-- 已询问：normal / late是否以开始时刻划界、无宽限还是5分钟；当前仅存建议，未实现争议RPC。
-- 已询问：小总结必填还是可选，尚未收到答复；不把未回复当同意。
+- 用户已确认：开始前15分钟至开始时刻（含）为normal、取完整计划分钟；开始后至结束前为late、按实际打卡至结束计时，无宽限。
+- 用户已确认：总结可选，可以直接完成；补卡亦不强制总结。规则见PRD v0.4 / ADR-014，RPC尚未实现。
 - 未发现Supabase URL / 客户端Key、高德平台Key、Supabase / Expo token；账号会话与项目尚未确认，不等于要求用户负责注册。
 - 先自主检查可用登录 / CLI并完成独立工作；确需秘密 / 邮箱确认 / MFA时才报告最小动作，不披露值。
 
@@ -75,7 +76,7 @@ Expo58 / RN0.88 / React19.3；timegrid 精确固定0.2.2，高德模块2.3.1。
 ## 8. 下一步
 
 1. 先读AGENTS、本文、DEVELOPMENT、agent-workflow，核对git status / log / PR，避免重复初始化或清理未知改动。
-2. 核实本阶段PR / CI / 合并状态；本地初始化与独立审查已完成，不重复初始化，不声称MVP完成。
+2. 核实本轮规则文档PR / CI / 合并状态；基础已合并，不重复初始化，不声称MVP完成。
 3. 按可用账号自主配置测试Supabase，部署基础迁移并验证真实Auth / RLS；同时做邮箱Auth与计划CRUD子任务。
-4. 最终产品规则确认后开发打卡RPC；高德Web代理和原生定位按七天计划接入。
+4. 按已确认无宽限 / 可选总结规则分派打卡与完成RPC；高德Web代理和原生定位按七天计划接入。
 5. 后续Agent自行处理CLI / 工具链安装，不把常规下载与排错退回用户。
