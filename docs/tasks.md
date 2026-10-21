@@ -1,78 +1,58 @@
-# Qoder 每日任务卡
+# 七天 MVP 任务总览
 
-每张卡按 DEVELOPMENT.md 第 4 节模板下发。以下为每日目标与文件边界。
+目标总览；具体卡放 docs/tasks/dayN/，格式见 docs/agent-workflow.md。
+代码使用新分支和子任务；主控自主安装、配置、排错、集成和部署。
+验收只凭实际证据；账号 / 设备不足写待验证。
 
-## Day 1
-目标：Expo+TS+Router 骨架；Supabase 邮箱登录；expo-gaode-map 定位跑通；timegrid 验证并渲染静态网格。
-允许新增：app/_layout.tsx, app/(auth)/login.tsx, app/(auth)/register.tsx, app/(tabs)/_layout.tsx, app/(tabs)/index.tsx, src/lib/supabase.ts, src/components/TimeGrid/*, src/constants/theme.ts, src/constants/subjects.ts
-禁止修改：docs/*, DEVELOPMENT.md
-验收：
-1. 新用户邮箱注册登录后可进入主页
-2. development build 下点击按钮能拿到当前经纬度
-3. 主页渲染 7 列 × 8:00–23:00 网格，今日列头高亮
-4. 点击空白格 console 打印开始/结束时间
-Commit 建议：feat(auth), feat(timetable), chore(config)
+## Day 0 — 先修正规范并推送
 
-## Day 2
-目标：计划 CRUD + 落格渲染 + 基础重复 + 复制到其他天。
-允许新增：src/components/PlanEditorSheet.tsx, src/components/PlanBlock.tsx, src/hooks/usePlans.ts, src/types/index.ts, app/plan/[id].tsx
-允许修改：app/(tabs)/index.tsx, src/components/TimeGrid/index.tsx
-验收：
-1. 创建 9:00–11:00 数学后网格对应位置出现数学色块
-2. 重启 App 后计划仍在
-3. 编辑时间后色块位置更新
-4. 删除后色块消失
-5. 复制到其他天生成新计划
-Commit 建议：feat(plan), feat(timetable)
+- 统一授权、角色、分支、审查、交接；移除反复人工审批和失效引用。
+- 保留用户已有改动意图，独立审查后提交并推送 GitHub。
+- 验收：入口指向 AGENTS / HANDOFF，不再把常规环境和人工合并设成用户任务。
+- 此阶段不夹带 Expo 业务实现。
 
-## Day 3
-目标：选点页 + 围栏绑定 + 半径滑块。
-允许新增：app/geofence/pick.tsx, src/lib/amap.ts, src/hooks/useGeofence.ts, src/lib/geo.ts
-允许修改：src/components/PlanEditorSheet.tsx
-验收：
-1. 计划编辑页开关可开启绑定
-2. 搜索“图书馆”返回 POI 列表，选中回填名称与经纬度
-3. 半径滑块 50–1000m 默认 200
-4. 保存后详情显示地点名与半径
-Commit 建议：feat(geofence), feat(ui)
+## Day 1 — 文档细化与技术栈初始化
 
-## Day 4
-目标：打卡闭环 + normal/late 判定 + 补卡。
-允许新增：src/components/CheckinSheet.tsx, src/hooks/useCheckin.ts, src/lib/duration.ts
-允许修改：app/plan/[id].tsx, src/components/PlanBlock.tsx
-验收：
-1. 围栏内 + 时间窗口内点击打卡写入 checkins
-2. 晚于开始打卡 type=late
-3. 围栏外提示未到达，不写入
-4. 计划结束后 7 天内补卡可手填分钟数并写总结
-Commit 建议：feat(checkin), fix(checkin)
+- 澄清打卡边界和总结，补齐 PRD、技术架构、Schema / 迁移设计。
+- 核查 Expo、timegrid、高德包的真实版本、peer 依赖和原生要求。
+- 初始化 Expo + TS + Router、设计 token、lint / typecheck 和 lockfile。
+- 按凭据推进邮箱 Auth / 云环境，不阻塞独立开发。
+- 验收：干净安装、检查、JS 打包通过；原生和云端单独记录。
 
-## Day 5
-目标：完成并写总结、顺延、统计页。
-允许新增：src/components/SummarySheet.tsx, app/(tabs)/stats.tsx
-允许修改：app/plan/[id].tsx, src/components/PlanBlock.tsx
-验收：
-1. 完成后色块变暗打勾，详情可见总结
-2. 顺延到明天生成次日同时间计划，原计划 missed
-3. 统计页科目累计时长、完成率、连续打卡天数正确（按 PRD 3.6）
-Commit 建议：feat(plan), feat(stats)
+## Day 2 — 计划与时间表
 
-## Day 6
-目标：空状态、加载态、定位失败提示、重叠错位、本地通知、视觉对齐。
-允许新增：src/components/EmptyState.tsx, src/lib/notifications.ts
-允许修改：全局 UI 样式
-验收：
-1. 无计划时显示空状态文案
-2. 定位失败有 Toast 提示
-3. 重叠计划右移并降透明度
-4. 计划开始前 10 分钟触发本地通知
-Commit 建议：feat(ui), feat(notification), style(ui)
+- 周一至周日、8:00–23:00 网格，空白格预填创建，科目低饱和色。
+- 计划 CRUD、时间和最短时长校验、本人数据持久化。
+- 验收：数学9:00–11:00落格、重启保留、编辑移动、删除隐藏、跨用户不能读写。
 
-## Day 7
-目标：EAS 构建、Supabase 统计视图、逐条验收。
-允许新增：eas.json, docs/changelog.md
-验收：
-1. Android APK 可安装
-2. iOS 开发包可运行
-3. PRD 第 5 节 8 条全部通过并记录
-Commit 建议：build(config), docs(changelog)
+## Day 3 — 可选地点围栏
+
+- 高德 POI 搜索选点；半径50–1000m，默认200m；保存名称和中心。
+- 一次前台定位和坐标系校准；拒权、超时与服务失败提示。
+- 验收：绑定可显示地点；不绑定无需定位；Web Key 不进客户端。
+
+## Day 4 — 打卡和补卡
+
+- PRD 确认后的时间窗口、normal / late / makeup、时长。
+- 有围栏需在范围，无围栏只看时间；不做后台轨迹。
+- 结束后七天内手填分钟补卡，防止重复提交生成多条。
+- 验收：时间端点、围栏内外、重复、补卡截止和分钟校验有边界测试。
+
+## Day 5 — 总结与统计
+
+- 手动完成和一句总结，按确认规则保存状态。
+- 科目累计、完成率、连续天数，明确补卡归属和删除行为。
+- 验收：固定数据、迟到、补卡、跨周、未到期计划的统计结果正确。
+
+## Day 6 — 体验与异常
+
+- 空 / 加载 / 网络错误状态、权限、重叠可操作、重复点击保护。
+- 设计 token、可访问性、极简启动，默认进时间表。
+- 验收：完整流程回归，无额外启动页，不把重动效和通知当上线前置。
+
+## Day 7 — 构建与验收
+
+- Agent 配置可用 Supabase / EAS 项目，Android 内测包，按条件验证 iOS。
+- 验证 Auth、RLS、POI / 原生定位、打卡和统计，输出已测 / 未测清单。
+- 验收：产物可追溯；缺秘密、签名、设备不能声称完整验收。
+- 更新 HANDOFF 和交付说明，不自动开启社交。

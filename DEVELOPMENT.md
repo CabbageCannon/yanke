@@ -1,97 +1,81 @@
-# 开发规范与 Qoder 协作流程
+# 开发规范
 
-## 1. 分支策略
-- `main` 为唯一长期分支，开启分支保护，禁止直接 push，必须走 PR
-- 每日从 `main` 开分支：`feature/dayN-主题`，如 `feature/day4-checkin`
-- 修复：`fix/简短描述`；杂项：`chore/`、`docs/`、`refactor/`、`test/`
-- 分支生命周期不超过 2 天
-- 合并方式：Squash merge，保持 main 线性
+适用于所有 Agent。授权入口见 AGENTS.md，执行流程见 docs/agent-workflow.md。
 
-## 2. Commit Message（Conventional Commits）
-格式：`<type>(<scope>): <subject>`
+## 1. 分支与提交
 
-type：feat / fix / refactor / style / perf / docs / test / chore / build / ci
-scope：timetable / plan / geofence / checkin / stats / auth / notification / ui / db / config / deps / docs
+- main 是唯一长期分支，保持可复现、可验证。修改经任务分支和 PR 集成。
+- 默认 codex/<type>-<topic>，例如 codex/chore-expo-bootstrap、codex/feat-plan-crud。
+- 主控创建 / 切换分支后再分派；共享目录中子 Agent 不自行切分支或操作公共 index。
+- 并行实现使用隔离 worktree；保留已有用户改动，仅提交已审阅文件。
+- 无需逐次批准 commit、push、PR、merge；独立审查和检查通过后主控可自主合并，遵守远程保护。
+- 优先 squash merge。回滚用新分支 revert，不强推 main。
+
+提交格式：`<type>(<scope>): <subject>`，采用 Conventional Commits。
+type：feat / fix / docs / chore / build / ci / test / refactor / perf / style。
+scope 按职责命名，例如 auth、timetable、plan、geofence、checkin、stats、db、config、deps、workflow。
 
 示例：
-- feat(timetable): 支持点击空白格创建计划
-- feat(geofence): 计划编辑页增加地点绑定与半径滑块
-- fix(checkin): 修正迟到打卡时长计算
-- chore(deps): 升级 expo-gaode-map
 
-粒度要求：
-- 一个 commit 只做一件逻辑完整的事，可独立运行、可独立回滚
-- 单次 diff 不超过 300 行，超过就拆
-- 禁止 update / fix bug / 修改 / wip
-- 提交前必须通过 lint 与 typecheck
+```text
+docs(workflow): align agent permissions and handoff rules
+chore(config): initialize Expo application
+feat(checkin): calculate late check-in duration
+```
 
-禁止提交：
-- .env、密钥、Supabase service role key、高德 Key 明文
-- node_modules、.expo、ios/、android/ 生成目录
-- 大段调试 console.log、整块注释代码
+一次提交完成一个逻辑目标。约 300 行是拆分参考，不是硬上限；脚手架、锁文件、迁移和必要联动可例外。
+禁止无意义的 update / wip；禁止提交依赖目录、构建产物、真实密钥。
 
-## 3. PR 规范
-- 即使单人开发也必须走 PR
-- 标题同样使用 Conventional Commits
-- 必须填写 `.github/pull_request_template.md`
-- PR 中逐条勾选 PRD 验收标准
+## 2. 自主执行与升级
 
-## 4. Qoder 任务下发模板
-### Context
-当前 Day N，分支 feature/dayN-xxx。
-关键文件：...
-数据表结构见 docs/schema.sql。
+用户已授权安装依赖 / CLI、环境、账号注册登录、Supabase / EAS / MCP 配置、部署、排错、Schema / 文档修改和 Git 集成。
+Agent 直接执行必要工作，记录结果，不把命令或常规故障交用户处理。
+新增依赖说明用途、许可和兼容性，使用 Expo 推荐的版本安装方式并提交 lockfile，不另求批准。
+只有缺失秘密 / 用户交互验证、实质产品冲突、重大架构 / 范围改变或超出授权的破坏性操作才升级。
 
-### Task
-实现：<一句话目标>
+## 3. 实现标准
 
-### Files
-- 允许修改：...
-- 允许新增：...
-- 禁止修改：...（如需改先说明）
+- TypeScript strict；避免无理由 any、静默 catch、伪造成功状态和多余抽象。
+- 路由放 app/，共享实现放 src/；UI 使用对应 docs/design-tokens.md 的主题常量。
+- 时间存 UTC timestamptz，展示和统计遵循 PRD 的业务时区；可信边界校验时长和权限。
+- 校验表单、网络失败、空状态、权限拒绝和重复操作。
+- 地点可选：无围栏只检查时间，不能被定位权限阻塞。
+- 不做后台定位、轨迹、防作弊、社交或手机号验证码。
+- 区分 Expo Go 和 development build；没有真机证据不能声称高德定位可用。
 
-### Acceptance
-1. ...
-2. ...
+## 4. 检查与证据
 
-### Constraints
-- 遵循本文件 commit 规范
-- 不引入重型依赖，新增依赖先列理由
-- 不提交 .env
-- UI 遵循 docs/design-tokens.md
+- 文档：核对引用、规则一致性和 git diff --check，无需纯文字测试。
+- 初始化后：npm ci、npm run lint、npm run typecheck，非平凡规则用小而有意义的边界测试。
+- 按改动验证 Metro 打包、Expo 配置、原生构建与设备流程；Web 打包不能代表移动端验证。
+- 数据库验证约束、RLS 用户隔离和迁移；只有 SQL 文件不代表已部署。
+- 回报写实际命令、结果、平台和未测项。失败要修复或标记，不勾选没运行的检查。
+- 缺密钥继续静态开发，但真实 Auth、POI、定位、云部署必须单独记待验证。
+- CI 不得把纯文档仓库当作已经初始化的应用。
 
-### Commit
-建议拆分：
-- feat(scope): ...
-- feat(scope): ...
+## 5. PR 与阶段交付
 
-## 5. Qoder 硬约束
-1. 不允许直接操作 main，所有改动在 feature 分支
-2. 涉及 3 个以上文件或新增依赖的任务，先输出改动方案与文件清单，人工确认后执行
-3. 每次任务结束必须产出可运行状态，不允许半成品过夜
-4. Qoder 生成的代码必须本地跑通再 commit
-5. 依赖新增需人工确认
-6. 任何 agent 在完成任务后，必须更新 HANDOFF.md 的第 2、3、4、6 节；
-   新增影响后续方向的决策时，必须追加到 docs/decisions.md。
-7. HANDOFF.md 只写当前状态，不写历史过程；总长度不超过 120 行。
-8. PM 与子 agent 的工作流严格遵循 docs/agent-workflow.md；PM 不得越权执行该文件第 11 节列出的不可委托事项。
+实现 Agent 写 result，独立审查 Agent 检查逻辑、安全、边界和验证覆盖，主控集成。
+PR 写最终行为、任务、实际验证、未测项与回滚方式，使用 .github/pull_request_template.md。
+检查和独立审查通过后主控自主合并，不逐卡等人工验收。
+真实设备 / 账号缺口保留为待验证，不能伪造或静默省略。
 
-## 6. 每日节奏
-- 开始：拉最新 main，开当天分支，拆 3–5 个 Qoder 子任务
-- 开发中：每完成子任务本地验证 → commit → push
-- 收尾：lint/typecheck → 开 PR 自审 → **更新 HANDOFF.md 的任务快照与已知坑** → Squash 合并 → 打 tag
-- 记录：更新 GitHub Projects 看板
+每阶段更新 HANDOFF：任务快照、产物、证据、半成品、阻塞、下一步。
+方向决策追加 docs/decisions.md；详情和历史放 docs/tasks/ 与 Git。
+HANDOFF 尽量不超过 120 行，主控自行提交，不需要用户改写或确认。
 
-## 7. CI
-PR 到 main 时运行 lint 与 typecheck，见 `.github/workflows/ci.yml`。
+## 6. 环境与秘密
 
-## 8. 环境变量
-- 提交 `.env.example`
-- 真实 `.env` 只放本地
-- 客户端仅用 Supabase anon key，service role key 永不进客户端
-- EAS 密钥用 `eas secret` 管理
+- 只提交 .env.example 占位符；真实值进忽略文件或平台秘密存储。
+- 客户端可用 Supabase publishable / anon Key，但必须依赖 RLS；service_role / secret Key 不进客户端。
+- EXPO_PUBLIC_* 不是秘密存储。高德 Web 服务 Key 放服务端，经鉴权代理请求 POI。
+- 原生高德 Key 按包名 / 签名约束并由构建配置注入，不能与 Web 服务 Key 混用。
+- 使用平台当前支持的 CLI，不记录令牌，不把登录信息写进 HANDOFF。
+- 账号 / 项目“已配置”以实际工具结果为准，授权不等于已完成。
 
-## 9. 回滚
-- main 必须随时可运行
-- 出包失败优先 revert 当天 PR，不在 main 热修
-- 第一周结束产出 CHANGELOG.md
+## 7. 任务交接
+
+任务卡含目标、依赖、分支、写入范围、验收、非目标、回报位置。
+阅读必要上下文不受文件白名单限制；合理联动由主控修订任务卡授权。
+不因超过三个文件、新增依赖或修改 Schema 重复求人工批准。
+下一 Agent 从 AGENTS / HANDOFF 读取状态，简述下一步后直接执行已授权工作。

@@ -1,96 +1,81 @@
-# HANDOFF — 研刻 YanKe 项目状态
+# HANDOFF — 研刻 YanKe
 
-> 本文件是项目当前状态的唯一事实来源。每个 PR 合并后必须更新。
-> 只写「现在」和「下一步」，历史决策见 docs/decisions.md，历史变更见 git log。
+状态入口；代码、命令结果、Git / 云平台状态才是完成证据。
+历史见任务回报与 Git，每阶段主控直接更新。
 
-**最后更新**：2026-10-18 by <你的名字>
-**当前阶段**：Day 0（文档与环境准备完成，尚未开始编码）
-**当前分支**：main
-**最新可用提交**：<commit hash>
-**最新内测包**：无
-
----
+**最后更新**：2026-10-21，主控 Agent
+**当前阶段**：Day 0，规范已修订，准备前置 GitHub 提交
+**当前分支**：codex/docs-autonomous-workflow
+**基准提交**：c656224（本阶段最终提交见 Git / PR）
+**仓库**：https://github.com/CabbageCannon/yanke （公开）
+**内测包 / 云部署**：无
 
 ## 1. 一句话状态
 
-仓库文档与规范已落库，Expo 项目尚未初始化。下一步是 Day 1：骨架 + 定位可行性验证 + 静态时间表。
+已有文档和占位配置，尚无 Expo 依赖、lockfile、路由；先修正规范提交 GitHub，再正式开发。
 
-## 2. 任务状态快照
+## 2. 任务快照
 
-对照 docs/qoder-tasks.md 的 Day 列表：
-
-| Day | 内容 | 状态 | 备注 |
-|---|---|---|---|
-| Day 1 | 骨架 + 定位验证 + 静态网格 | 未开始 | 关键风险：expo-gaode-map 与 timegrid 可用性 |
-| Day 2 | 计划 CRUD | 未开始 | |
-| Day 3 | 选点 + 围栏绑定 | 未开始 | |
-| Day 4 | 打卡闭环 | 未开始 | |
-| Day 5 | 总结 + 统计 | 未开始 | |
-| Day 6 | 打磨 + 通知 | 未开始 | |
-| Day 7 | 构建 + 验收 | 未开始 | |
-
-状态取值只用：未开始 / 进行中 / 待验证 / 已完成 / 阻塞。
-
-## 3. 已完成且可运行的东西
-
-- 无。当前仓库只有文档，没有可运行代码。
-
-## 4. 进行中 / 半成品（下一个 agent 必须知道）
-
-- 无。
-
-## 5. 阻塞项
-
-- 无。
-
-## 6. 已知坑与技术债
-
-- 无。（踩坑后立即记录，例如“expo-gaode-map 在 Expo Go 下不可用，必须 development build”）
-
-## 7. 关键决策速查
-
-完整见 docs/decisions.md。当前生效的决策摘要：
-
-- 后端用 Supabase 而非 Firebase（国内可访问性）
-- 登录第一版用邮箱，不做手机号验证码
-- 时间表组件优先 `@symbiot.dev/react-native-timegrid`，Day 1 验证，失败降级
-- 打卡只附着于计划，不独立存在；不做防作弊与轨迹
-- 第一周不做社交，第二周迭代
-
-## 8. 环境与密钥（不含密钥本体）
-
-- `.env` 需包含：`EXPO_PUBLIC_SUPABASE_URL`、`EXPO_PUBLIC_SUPABASE_ANON_KEY`、`EXPO_PUBLIC_AMAP_WEB_KEY`
-- Supabase 项目节点：<填写>
-- 高德 Key 类型：Web 服务 Key（用于 POI 搜索）；客户端定位 Key 见 expo-gaode-map 配置
-- 密钥获取方式：<填写，例如“私聊仓库所有者”或“1Password 条目 yanke-env”>
-
-## 9. 给新 agent 的阅读顺序
-
-1. 本文件（你正在读）
-2. agent-workflow.md
-3. README.md
-4. DEVELOPMENT.md
-5. docs/prd.md
-6. docs/decisions.md
-7. docs/qoder-tasks.md 中当前 Day 及之后的任务卡
-8. docs/design-tokens.md
-9. docs/schema.sql
-
-读完不要立刻写代码，先按第 10 节模板输出你的理解与计划。
-
-## 10. 新 agent 启动自检模板
-
-每个新 agent 接手时，先输出以下内容，等人工确认后再动手：
-
-- 你对产品核心闭环的一句话理解
-- 当前阶段与你判断的下一步
-- 你计划修改/新增的文件清单
-- 你不打算动但可能相关的文件
-- 你需要人工确认的疑问（最多 3 条）
-- 你发现的本文件与代码不一致之处
-
-## 11. 更新记录
-
-| 日期 | 更新者 | 变更 |
+| 阶段 | 内容 | 状态 |
 |---|---|---|
-| 2026-10-18 | <你> | 初始化 |
+| Day 0 | 授权 / SOP / 引用修订，独立审查后先推送 GitHub | 已审查，待推送 |
+| Day 1 | PRD / 架构 / Schema、Expo 与依赖验证 | 未开始 |
+| Day 2 | 计划 CRUD 和网格持久化 | 未开始 |
+| Day 3 | 高德选点与可选围栏 | 未开始 |
+| Day 4 | 打卡、迟到时长、七天补卡 | 未开始 |
+| Day 5 | 总结和统计 | 未开始 |
+| Day 6 | 异常、视觉与启动体验 | 未开始 |
+| Day 7 | 云端、构建与设备验收 | 未开始 |
+
+## 3. 已完成与证据
+
+- origin 已连接，远程 main 为 c656224，不需重复 clone。
+- Git / Node / npm / gh 可用；gh 登录 CabbageCannon，可访问仓库。
+- 已读原文件，确认过时人工门禁、失效 qoder-tasks 引用、产品歧义。
+- 仅为工具和仓库检查，不代表 Expo / 数据库 / 云服务已运行。
+- 文档链接和 git diff --check 通过；独立审查无阻塞，剩余初始化配置问题见第 6 节。
+
+## 4. 进行中
+
+- Day 0 独立审查、提交、推送完成前不开展应用实现。
+- 起点有用户未提交修改：agent-workflow 阅读路径调整、删除 new-agent-instruction、增加 tasks/.gitkeep。
+- 保留删除旧入口，以 AGENTS.md 替代；阅读路径意图纳入 SOP。
+
+## 5. 阻塞与输入
+
+- 待澄清 normal / late 重叠：建议开始时刻为界、无宽限。
+- 待澄清总结可选还是必填：新需求建议填一句后完成。
+- 高德平台 Key、Supabase URL / publishable Key 尚未提供或发现。
+- 不阻塞规范和脚手架；真实集成按实际凭据与账号状态推进。
+
+## 6. 已知限制
+
+- package.json 只有 scripts，app.config.ts 引用了未安装插件，不能视作已初始化。
+- 原 CI 在无 lockfile 时 npm ci；需区分文档阶段与应用阶段。
+- 高德原生需 development build，Expo Go / Web 不证明原生定位可用。
+- 旧 SQL 无唯一打卡、完整所有权关联，统计 view 需检查 RLS；未验证不得部署。
+- 高德 Web Key 不可放 EXPO_PUBLIC，需服务端鉴权代理。
+- Windows 无本机 iOS 原生构建，EAS / Apple 状态未验证。
+
+## 7. 生效授权与决策
+
+- 主控规划集成，代码必须经新分支和子任务，独立审查。
+- 依赖 / CLI / 环境 / 账号注册登录 / 云配置部署 / 文档 Schema / Git 合并均持续授权。
+- 仅缺秘密 / 交互验证、产品冲突、重大架构等才升级，不重复问权限。
+- 第一次先提交推送规范再正式初始化，每阶段更新本文。
+- 第一周无社交、防作弊、轨迹、手机号验证码；未绑定地点只看时间。
+
+## 8. 环境与凭据位置
+
+- Windows / PowerShell，Node 24.21.0，npm 11.19.0。
+- GitHub 已登录，不需要用户再提供访问令牌。
+- Supabase / EAS / 高德账号、项目与 Key 尚未确认；授权不是配置完成。
+- 真实值只在忽略文件 / 平台秘密存储，本文不含密钥。
+
+## 9. 下一步顺序
+
+1. 读 AGENTS、本文、DEVELOPMENT、docs/agent-workflow。
+2. 查工作区 / 远程，确认 Day 0 是否已推送，避免重复或丢改动。
+3. 完成独立审查与前置 GitHub 提交，再开初始化分支和子任务。
+4. 细化架构 Schema，核查实际依赖版本，不照占位配置盲装。
+5. 缺凭据继续独立工作，真实结果写回报和本文。

@@ -2,15 +2,26 @@ name: CI
 on:
   pull_request:
     branches: [main]
+  push:
+    branches: [main]
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check patch whitespace
+        run: git show --format= --check HEAD
+      - name: Record documentation-only bootstrap
+        if: ${{ hashFiles('package-lock.json') == '' }}
+        run: echo "Application not initialized; dependency checks are not applicable yet."
       - uses: actions/setup-node@v4
+        if: ${{ hashFiles('package-lock.json') != '' }}
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
+        if: ${{ hashFiles('package-lock.json') != '' }}
       - run: npm run lint
+        if: ${{ hashFiles('package-lock.json') != '' }}
       - run: npm run typecheck
+        if: ${{ hashFiles('package-lock.json') != '' }}
