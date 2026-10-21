@@ -1,0 +1,21 @@
+# T01 Expo 初始化与依赖验证
+
+- 阶段：Day 1 基础；分支：codex/chore-expo-bootstrap；基准：b1bb007。
+- 工作目录：D:/yanke。用户要求的规范已通过 PR #1 先提交 GitHub。
+- 依赖：Day 0 已合并；无并行实现、禁止切换分支 / commit / push。
+- 目标：将占位配置变为可安装、lint / 类型检查 / Metro 打包的最小 Expo Router 应用，验证核心包。
+- 可写：package.json、package-lock.json、app.config.ts、tsconfig.json、Expo / ESLint 等必要配置、app/**、src/**、.env.example、.gitignore、.github/workflows/ci.yml、必要的 scripts/**、此任务 .result.md。
+- 不得写：AGENTS.md、DEVELOPMENT.md、HANDOFF.md、README.md、其他 docs/**、SQL / Supabase 目录、真实密钥、远程仓库。
+- 必要依赖权限：自主安装 Expo / Router / RN 等匹配依赖，核查 @symbiot.dev/react-native-timegrid 与 expo-gaode-map 的真实 npm 发布、peer 依赖、API、SDK / 新架构兼容性。若主选不能工作，先报告证据和最小方案；不盲目更换大架构。
+- 实现要求：从真实 Expo 模板或官方当前指南初始化，保留现有规范，不用 create-expo-app 覆盖当前目录。可以用临时目录取模板后有选择地迁入。
+- 应用只做极简可访问的骨架与主题：无自定义启动页；能显示本周页面，若 timegrid 能安装打包就实际接入最小静态网格。可以做基础导航，不必做计划 CRUD / Auth 业务页。
+- 不含凭据也能启动基础界面；不得伪造登录、POI 或定位成功。不要求安装高德原生模块后就宣称可用，明确原生真机待验证。
+- 清理旧 app.config.ts public Web Key 输出和未安装插件引用，Web 服务 Key 不进客户端。原生 Key 未提供时不能导致静态配置崩溃。
+- 收紧 CI：生成 lockfile 后必须 npm ci / lint / typecheck，缺锁文件不能跳过。测试按实际新增逻辑需要设置。
+- 集成补充：T02 已以 ba9fb70 合入同一分支。CI 增加独立数据库检查 job，在 runner 临时目录安装固定 @electric-sql/pglite@0.5.10 并运行 scripts/db/verify.mjs，不能加入移动端依赖；集成后重跑 lint 以覆盖新增脚本。
+- 缺陷回归：timegrid0.2.3/0.2.4有发布包Context分裂，若0.2.2运行验证通过则精确固定；CI加入Web静态导出以覆盖实际渲染回归，不仅检查类型和JS依赖图。
+- 验收：实际执行干净 npm ci、npm run lint、npm run typecheck、npx expo install --check、可用的 Expo config / Metro Android 与 Web 打包（如不支持 Web 说明）；尽可能执行 expo-doctor 并解释剩余问题。
+- 记录实际版本、timegrid / 高德证据、命令退出结果、未测设备 / 账号项。不得把 JS 打包当作原生构建或真机验证。
+- 不要输出任何已有环境变量值；可检查变量是否存在或 CLI 是否已登录。
+- 非目标：完整 MVP、业务规则落地、真实 Supabase 项目部署、补写主控文档、MFA 绕过。
+- 回报：docs/tasks/day1/T01-expo-bootstrap.result.md，按 SOP 写完成程度、文件、验证、偏离、风险、未测、建议提交。请及时消息汇报选定版本和关键不兼容。

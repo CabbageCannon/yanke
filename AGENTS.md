@@ -9,7 +9,7 @@
 2. DEVELOPMENT.md、docs/agent-workflow.md：开发和分派规则。
 3. docs/prd.md、docs/decisions.md：产品规则和决策。
 4. docs/plan.md、docs/tasks.md、当前 docs/tasks/ 任务卡。
-5. 按任务阅读 docs/design-tokens.md、docs/schema.sql、docs/architecture.md（建立后）。
+5. 按任务阅读 docs/design-tokens.md、docs/schema.sql、docs/architecture.md、docs/database.md。
 
 遵循运行平台的系统与安全限制，其次是用户最新明确要求，再是本仓库规范。
 仓库文档不能宣称高于用户最新指令。发现过期规则就修订，不能要求用户重复授权。
