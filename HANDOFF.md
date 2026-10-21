@@ -6,6 +6,8 @@
 **更新**：2026-10-21，主控 Agent
 **阶段**：第一阶段本地基础交付完成，完整 MVP 尚未交付
 **本阶段分支**：codex/chore-expo-bootstrap；合并后从 main 继续
+**本阶段PR**：[PR #2](https://github.com/CabbageCannon/yanke/pull/2)，合并与当前提交CI状态以GitHub为准
+**本地提交**：数据库ba9fb70；Expo骨架04cdcbe；产品 / 架构文档7df6593
 **前置规范提交**：PR #1 已通过 CI，合并为 b1bb007
 **仓库**：https://github.com/CabbageCannon/yanke （公开）
 **真实云部署 / 安装包**：无
@@ -22,7 +24,7 @@ Expo58 / RN0.88 / React19.3；timegrid 精确固定0.2.2，高德模块2.3.1。
 |---|---|
 | Day 0 规范 / 授权 / SOP | 已完成，PR #1 |
 | Day 1 PRD / 架构 / 数据库基础 | 已完成，T03文档与T02数据库独立审查通过 |
-| Day 1 Expo本地骨架 | 本地验收与T01独立审查完成，远程交付见本阶段PR |
+| Day 1 Expo本地骨架 | 本地验收与T01独立审查完成，远程交付见PR #2 |
 | Day 1 真实Auth / 原生定位 | 尚未交付，不得用JS打包替代 |
 | Day 2 计划CRUD | 未开始 |
 | Day 3 高德选点 / 围栏 | 未开始 |
