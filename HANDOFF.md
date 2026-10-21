@@ -6,6 +6,7 @@
 **更新**：2026-10-21，主控 Agent
 **阶段**：第一阶段基础已合并；本轮同步两项已确认产品规则，完整 MVP 尚未交付
 **本阶段分支**：codex/docs-checkin-rules；合并后从 main 继续
+**本轮PR**：[PR #3](https://github.com/CabbageCannon/yanke/pull/3)，规则同步；合并与当前提交CI状态以GitHub为准
 **基础交付**：[PR #2](https://github.com/CabbageCannon/yanke/pull/2)已合并为991b1bb，PR与main两项CI均通过
 **前置规范提交**：PR #1 已通过 CI，合并为 b1bb007
 **仓库**：https://github.com/CabbageCannon/yanke （公开）
@@ -45,7 +46,7 @@ Expo58 / RN0.88 / React19.3；timegrid 精确固定0.2.2，高德模块2.3.1。
 ## 4. 本轮交付与保留项
 
 - T01 / T02 / T03任务卡、result与独立review已记录，基础交付已合并PR #2；T04规则文档独立审查通过，远程状态以对应PR为准。
-- CI已强制npm ci / lint / typecheck / 版本检查 / Web静态导出，另有临时PGlite数据库检查job；当前提交对应结果见本阶段PR的Checks。
+- CI已强制npm ci / lint / typecheck / 版本检查 / Web静态导出，另有临时PGlite数据库检查job；当前提交对应结果见本轮PR的Checks。
 - T00审查遗留的public高德Web Key输出和无lockfile跳过CI已清理。
 - 数据库子任务来自隔离分支，已集成；临时worktree已确认干净后用git worktree remove清理，ba9fb70与本地任务分支保留。
 
