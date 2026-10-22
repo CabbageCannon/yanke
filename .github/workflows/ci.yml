@@ -18,6 +18,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
+      - run: npm run test:auth
       - run: npx expo install --check
       - name: Render the app with a web export
         run: npx expo export --platform web --output-dir "$RUNNER_TEMP/yanke-web-export" --max-workers 2

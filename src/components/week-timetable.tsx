@@ -1,20 +1,22 @@
 import { TimeGrid } from '@symbiot.dev/react-native-timegrid';
 import { addDays, format, startOfWeek } from 'date-fns';
 import { zhCN } from 'date-fns/locale/zh-CN';
-import { useState } from 'react';
-import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { useState, type ReactNode } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { theme } from '@/theme';
 
-export function WeekTimetable() {
+export function WeekTimetable({ toolbar, notice }: { toolbar?: ReactNode; notice?: string }) {
   const [weekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
-  const { width } = useWindowDimensions();
+  // SSR viewport width is zero; mount the grid after measuring its container.
+  const [gridWidth, setGridWidth] = useState(0);
   const weekEnd = addDays(weekStart, 6);
 
   return (
     <SafeAreaView style={styles.screen}>
       <View style={styles.heading}>
+        {toolbar}
         <Text accessibilityRole="header" style={styles.title}>
           本周时间表
         </Text>
@@ -22,13 +24,14 @@ export function WeekTimetable() {
           {format(weekStart, 'M月d日')} — {format(weekEnd, 'M月d日')}
         </Text>
         <Text style={styles.caption}>本周还没有学习计划</Text>
+        {notice && <Text style={styles.caption}>{notice}</Text>}
       </View>
-      <View style={styles.grid}>
-        <TimeGrid
+      <View style={styles.grid} onLayout={({ nativeEvent }) => setGridWidth(nativeEvent.layout.width)}>
+        {gridWidth > 0 && <TimeGrid
           startDate={weekStart}
           weekStartsOn={1}
           numberOfDays={7}
-          width={width}
+          width={gridWidth}
           timeFrom={8 * 60}
           timeTo={23 * 60}
           timeInterval={30}
@@ -57,7 +60,7 @@ export function WeekTimetable() {
             eventBackgroundColor: theme.subjects.other,
             eventTextColor: theme.colors.text,
           }}
-        />
+        />}
       </View>
     </SafeAreaView>
   );

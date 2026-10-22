@@ -1,6 +1,6 @@
 # 数据库基础（T02）
 
-当前交付是表、约束、权限、统计视图和本地验证，**没有最终打卡 / 完成业务 RPC，也未部署 Supabase**。用户已确认normal窗口为开始前15分钟至开始时刻（含）、此后至结束前为late且无宽限，总结可选；客户端仍不能写 `checkins`，因此还不能完成真实打卡闭环。规则见PRD与ADR-014，后续RPC需实现并测试。
+基础迁移已部署独立免费测试项目yanke-dev（Tokyo，PostgreSQL17.11），T07真实GoTrue / JWT / PostgREST双用户隔离等11组检查通过。当前主分支尚未集成最终打卡 / 完成RPC；T08在隔离分支实现并独立审查中，客户端仍不能直接写checkins。用户已确认normal为开始前15分钟至开始时刻（含）、之后至结束前为late，无宽限，总结可选；规则见PRD / ADR-014，函数存在与完整App闭环需分别验收。
 
 ## 来源与迁移
 
@@ -8,7 +8,7 @@
 - `docs/schema.sql` 是现有迁移 SQL 的顺序拼接副本，供阅读，不是第二个编辑入口。本次只有初始迁移，两个文件内容完全一致。
 - 新增迁移时重新拼接副本；`scripts/db/verify.mjs` 会检查一致性并在新建的临时数据库重放全部迁移。
 - 初始迁移依赖 Supabase 提供的 `auth.users`、`auth.uid()`、`anon` / `authenticated` / `service_role`，使用 PostgreSQL 15+ 的 `security_invoker` 视图。本地验证替换这些平台对象，不模拟完整 Supabase。
-- 尚未创建云项目或执行远程迁移。真实部署后必须另测 Auth 注册触发器、PostgREST 列权限、JWT / RLS、注销账号与实际 PostgreSQL 版本。
+- 初始迁移20261021000100已部署；T07已核实远程迁移一致，并验证注册建档触发器、列权限、JWT / RLS及测试账号删除级联。真实注册邮件送达与App会话由对应任务另测；云验证重放入口见scripts/integration/README.md。
 
 ## 表与客户端合同
 
