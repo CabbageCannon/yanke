@@ -9,7 +9,7 @@
 flowchart LR
   UI[Expo / React Native] --> AUTH[Supabase 邮箱 Auth]
   UI --> DB[Postgres：RLS / 计划]
-  UI --> RPC[后续 RPC：打卡 / 完成 / 统计]
+  UI --> RPC[RPC：打卡 / 完成 / 连续天数]
   UI --> SDK[高德原生前台定位]
   UI --> POI[鉴权 Edge Function：POI]
   POI --> AMAP[高德 Web 服务]
@@ -18,7 +18,7 @@ flowchart LR
 
 - 客户端：周网格、表单、一次定位、围栏距离判断、手写总结和轻量统计展示。
 - Auth / 数据库：邮箱密码、会话、本人数据隔离、唯一记录与有效状态约束。
-- 后续 RPC：服务器时间判断、时长计算、幂等写入、补卡边界、完成状态更新。
+- RPC：服务器时间判断、时长计算、幂等写入、补卡边界、完成状态更新；T08已部署并完成真实云验收，客户端由T10接入。
 - 后续 Edge Function：验证用户并代理 POI，隐藏 Web 服务 Key；不新建独立常驻后端。
 - 管理：使用 Supabase Studio，不做第一周 Web 后台。
 
@@ -52,12 +52,12 @@ docs/tasks/               子任务、回报、独立审查
 2. 空白格给出当地日期和起始时刻，表单校验后写 plans；服务端约束兜底。
 3. 未绑围栏的计划不请求位置；绑定后在用户点击打卡时请求一次前台位置。
 4. 定位与 POI 坐标统一后客户端计算距离，范围内才允许进入实时打卡请求。
-5. 后续 RPC 从 auth.uid() 取得用户，以服务器时刻校验窗口，生成唯一 checkin 和分钟数。
+5. RPC 从 auth.uid() 取得用户，以服务器时刻校验窗口，生成唯一 checkin 和分钟数。
 6. 重复提交返回已有结果或明确冲突，不能增加第二条；请求失败不显示成功。
-7. 完成 / 总结通过后续原子操作写入；总结可选，空白不阻止直接完成，有内容时去首尾空白保存。
+7. 完成 / 总结通过RPC原子写入；总结可选，空白不阻止直接完成，有内容时去首尾空白保存。
 8. 统计从数据库有效记录计算，不用当前画面色块反推时长。
 
-基础 Schema 先禁止客户端直接写 checkins。时间与总结规则已确认，最终 RPC 仍待后续任务实现；表存在不代表闭环已能写入。
+Schema禁止客户端直接写checkins。T08四RPC已部署并完成8组真实JWT / PostgREST及独立连接并发验收；客户端闭环由T10实现，函数存在不代表完整App已交付。
 
 ## 4. 时间与统计合同
 
@@ -96,8 +96,8 @@ docs/tasks/               子任务、回报、独立审查
 - profiles、plans、checkins 均开启 RLS；显式 grants，禁止以 view 绕过本人隔离。
 - checkins 对 (plan_id, user_id) 建同用户关联，并约束每计划唯一。
 - plans 软删除隐藏于时间表；保留 checkins 和历史时长。真正账号删除按既定级联清理。
-- 统计 view 使用 security_invoker；后续函数固定 search_path，验证 auth.uid() 与计划所有权。
-- SQL / 本地stub验证与云端证据分开记录；T07已完成基础迁移的真实Auth / JWT / PostgREST双用户隔离11组验证，新增RPC仍需独立验收。
+- 统计 view 使用 security_invoker；RPC固定空search_path，验证auth.uid()与计划所有权。
+- SQL / 本地stub验证与云端证据分开记录；T07基础真实服务11组、T08新增RPC云8组均通过，本地42组与独立审查见任务回报。
 - T02 已交付基础迁移与验证脚本；准确命令和云端未测边界见 docs/database.md，docs/schema.sql 为受一致性检查的阅读副本。
 
 ## 8. 运行环境与部署
