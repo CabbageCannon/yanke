@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-Expo Router 基础应用与数据库基础已建立，当前展示本周空时间表；完整 MVP 尚未完成。
+Expo Router应用、Supabase邮箱账号和云端数据库基础已建立；登录后展示本周空时间表，计划CRUD按T06继续。完整 MVP 尚未完成。
 [HANDOFF.md](HANDOFF.md) 提供最新状态与验证证据，不能仅凭 scripts 判断可启动。
 已连接 [GitHub](https://github.com/CabbageCannon/yanke)，无需重新 clone。
 
@@ -41,7 +41,7 @@ npx expo-doctor
 无密钥可运行当前静态时间表。需要接真实服务时，从 .env.example 生成忽略的本地配置或使用平台 secrets，不提交真实值。
 `npm run android` / `npm run ios` 是原生 development build 命令，需要相应工具链；Windows 无法本机构建 iOS。
 高德 JS 配置检查和 Android JS / Hermes 打包不等于已构建 APK 或验证真机定位。
-当前没有计划 CRUD、Auth UI、打卡 RPC、POI 代理、总结和完整统计页面；这些按七天计划继续实现。
+已实现邮箱注册 / 登录 / 退出、持久会话和账号切换隔离；真实注册确认邮件送达尚未验证。当前没有计划CRUD、打卡 / 总结 / 完整统计页面或POI代理；后端RPC进度见HANDOFF。
 
 ## Agent 接手
 

@@ -29,7 +29,8 @@ flowchart LR
 - T01 基础为 Expo58 / RN0.88 / React19.3；timegrid0.2.3/0.2.4有发布Context缺陷，已精确固定0.2.2并通过Web静态渲染与Android JS/Hermes导出，详见 ADR-012 和最终回报。
 - 时间表优先实际验证 @symbiot.dev/react-native-timegrid；初始化不仅看 peer 范围，还要导入和打包。
 - 高德原生候选 expo-gaode-map；核查插件入口、权限、Key 注入、SDK / 新架构要求。
-- 后续 Auth 任务接入 Supabase 官方 JS 客户端；会话持久化选择官方 RN 支持的存储方式，按需配置刷新和 AppState。当前骨架尚未接入 Auth UI / 客户端。
+- T05已接入Supabase官方JS客户端、AsyncStorage会话持久化、URL polyfill、邮箱Auth界面和AppState刷新管理；挂载后创建客户端以避免SSR触碰存储。SDK2.118使用内置刷新协调，不再添加deprecated processLock。
+- 个人页面受会话边界保护：退出 / 切账号清空个人子树，旧请求通过scope失效；同账号正常刷新不重挂载或丢失编辑内容。T06个人数据请求需检查scope.isCurrent()后再回填。
 - MVP 不引入全局状态框架、离线写队列或后台定位服务；先用组件状态 / 简单业务 hooks。
 
 建议目录，按最终脚手架调整，不为占目录创建空抽象：
@@ -96,7 +97,7 @@ docs/tasks/               子任务、回报、独立审查
 - checkins 对 (plan_id, user_id) 建同用户关联，并约束每计划唯一。
 - plans 软删除隐藏于时间表；保留 checkins 和历史时长。真正账号删除按既定级联清理。
 - 统计 view 使用 security_invoker；后续函数固定 search_path，验证 auth.uid() 与计划所有权。
-- SQL / 本地 stub 验证不代表已通过 Supabase 云端权限与 Auth 集成。
+- SQL / 本地stub验证与云端证据分开记录；T07已完成基础迁移的真实Auth / JWT / PostgREST双用户隔离11组验证，新增RPC仍需独立验收。
 - T02 已交付基础迁移与验证脚本；准确命令和云端未测边界见 docs/database.md，docs/schema.sql 为受一致性检查的阅读副本。
 
 ## 8. 运行环境与部署
