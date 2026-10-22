@@ -1,8 +1,8 @@
 # T08 打卡 / 补卡 / 完成与连续天数 RPC 回报
 
-- 状态：本地实现和 PostgreSQL 语义自测完成，接口与代码冻结，待独立审查 / 主控集成。
+- 状态：SQL / 本地42组及独立审查已通过，PR #5 已合并 main `c74e16e`；审查后追加云部署和真实8组验收完成，新增脚本 / 说明冻结待独立审查。
 - 日期：2026-10-22；分支：`codex/feat-checkin-rpcs`；基准：`ad00493`；worktree：`D:/yanke-checkin-rpcs`。
-- 未修改旧迁移、应用、依赖、主目录分支 / index、T07 配置或云端业务；未 commit / push。
+- 实现阶段未修改旧迁移、应用、依赖、主目录分支 / index 或 T07 配置；SQL经主控提交 / 合并后，按扩展任务只向既有项目追加已审迁移。本人不操作 Git。
 
 ## 接口合同
 
@@ -66,12 +66,38 @@ git diff --check
 
 精确端点测试方法：先用原封不动的生产迁移执行建库、原24组基础检查、生产入口服务器时刻验证；随后只在一次性 PGlite 数据库中将**两处** `pg_catalog.clock_timestamp()` 改为测试时钟并重建函数，再验证精确端点。脚本断言只替换两处；测试时钟 schema 不在部署迁移中，也没有对外可传 `p_now` 的生产入口。
 
-## 云端 / 并发边界与下一步
+## 审查后真实云部署与8组验收
 
-- T07 已在 `yanke-dev`（Tokyo，PG17.11）部署基础迁移，并通过11组真实 GoTrue / JWT / PostgREST / RLS 检查；那不等于 T08 RPC 已部署或验证。
-- 本轮遵照主控要求**没有**部署新迁移，没有用云端测试身份改写业务，也没有清理 T05 / T06 UI 沙箱。
-- PGlite auth.users / auth.uid / 平台角色是桩，规则执行是实际 PostgreSQL。快速请求因 PGlite 单连接排队，只证明重放 / 唯一结果，不能替代两个独立事务争锁的验收。
-- 独立 SQL 审查并集成后，由主控在同一免费测试项目部署新迁移，再验真实 JWT / PostgREST 四 RPC、参数解析、小数拒绝与跨连接并发。不要为端点测试给云端生产函数加客户端时间参数。
+- SQL 独立审查 / 本地42组重放通过后，主控授权在已有 `yanke-dev`（ref `jhaxdxokcszbbkbvagtl`，Tokyo）追加迁移。先 `supabase link` 到准确项目；`migration list --linked` 与 `db push --dry-run --linked` 显示只有 `20261022000100_checkin_rpcs.sql` 待执行。
+- `npx --yes supabase@2.121.0 db push --linked --yes` 退出0，明确 Applying migration。部署后和恢复执行时再次 `migration list --linked` / `db push --linked --dry-run`：两条 local / remote 都存在，`upToDate=true`，没有待执行迁移。未重建基础库 / 覆盖云 Auth / 改写已审 SQL。
+- 新增 `scripts/integration/verify-checkin-rpcs.mjs`，更新 `scripts/integration/README.md` 与 `docs/database.md`。原生 fetch 负责真实 GoTrue / PostgREST，MIT 许可 `pg@8.16.3` 仅装 `D:/yanke-tools/db-integration`，不增加应用依赖。
+- 脚本读取已忽略的 `D:/yanke/.env.integration.local`，显式 ref 确认，只连接匹配的session pooler。初次 TLS 连接因 Supabase自签根链拒绝，未创建身份；从官方HTTPS源读取并固定指纹校验 Supabase Root2021 CA 后，保持 `rejectUnauthorized=true` 成功连接PG17.11。没有降低TLS验证。
+
+```powershell
+$env:YANKE_SUPABASE_INTEGRATION_CONFIRM = 'jhaxdxokcszbbkbvagtl'
+node --env-file=D:/yanke/.env.integration.local scripts/integration/verify-checkin-rpcs.mjs D:/yanke-tools/db-integration/node_modules/pg/lib/index.js
+```
+
+实际退出0，共8组通过：
+
+1. 真实 JWT 实时 normal、原记录重放、手动完成与总结 trim / 省略保留 / 空白清空。
+2. 真实服务器时刻 late 与剩余分钟、围栏明确 true。
+3. PostgREST numeric 参数拒绝小数 / 非有限 / 空 / 越界；有效补卡、原学习日、可选总结、不自动完成、重复冲突。
+4. 无打卡完成不加分钟或打卡日，总结超限不留下半状态。
+5. 四入口匿名拒绝、写入口跨用户 / 删除拒绝，直接 checkins 写仍被禁止。
+6. 独立连接锁住本轮计划，观察 **2个**不同PG后端确实等待锁；释放后四个实时调用返回同一记录 / 时间 / 分钟。
+7. 独立连接持锁，观察 **4个**不同PG后端等待；释放后补卡一次成功、三次23505，库中仅一条。
+8. 补卡归原日、软删 / 编辑保留历史、今日无卡从昨天起算、补齐连续日期、不同用户隔离。
+
+本轮两个随机 `@example.invalid` 身份由管理员确认创建，不发送邮件；finally 只删除本轮创建的Auth身份，并逐个检查 profiles / plans / checkins 级联无遗留，输出 `2/2` 清理通过。未读取输出或删除 T05 / T06 UI 沙箱，未把任何服务端值写入客户端 / Git。并发请求及时挂接 allSettled，避免网络失败在释放锁前产生未处理拒绝。
+
+`node --check scripts/integration/verify-checkin-rpcs.mjs` 与 `git diff --check` 通过。云脚本最终只加强并发请求失败收集，没有改生产SQL或测试断言；交独立上下文审查 / 重放。
+
+## 保留边界
+
+- PGlite auth.users / auth.uid / 平台角色仍是桩；快速排队不等于并发。上述真实云争锁另有独立连接 / pg_blocking_pids 证据。
+- 云端仅测真实当前可成立窗口，不修改服务器时钟。精确normal / late / 168小时端点仍引用本地42组，不为测试增加生产时间参数。
+- 未验证真实注册确认 / 密码重置邮件送达，管理员确认的沙箱不替代邮箱收件验收。
 - 未含 App 页面、POI代理、原生定位 / 安装包 / 真机验证；不能称完整 MVP。
 
-建议提交：`feat(checkin): add trusted check-in completion and streak RPCs`。
+SQL 已合并；本次云验收建议提交：`test(checkin): verify cloud RPCs and concurrent transactions`。
