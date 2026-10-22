@@ -1,6 +1,6 @@
 # 数据库与打卡 RPC（T02 / T07 / T08）
 
-基础迁移已部署专属免费测试项目 `yanke-dev`（Tokyo，PostgreSQL 17.11），T07 的真实 GoTrue / JWT / PostgREST / 双用户 RLS 共11组检查通过。T08 追加打卡、补卡、完成和连续天数 RPC，本地42组及独立审查通过，尚未部署云端新迁移。客户端仍不能直接写 `checkins`。规则见PRD v0.4 / ADR-014；数据库能力不代表 App、定位或完整 MVP 已验收。
+两条迁移已部署专属免费测试项目 `yanke-dev`（Tokyo，PostgreSQL 17.11）：T07 的真实 GoTrue / JWT / PostgREST / 双用户 RLS 共11组通过；T08 独立 SQL 审查及本地42组通过后，追加 RPC 迁移，真实四 RPC / 独立事务争锁共8组通过。客户端仍不能直接写 `checkins`。规则见PRD v0.4 / ADR-014；数据库能力不代表 App、定位或完整 MVP 已验收。
 
 ## 来源与迁移
 
@@ -8,7 +8,7 @@
 - `docs/schema.sql` 是现有迁移 SQL 按文件名排序、以一个换行连接的副本，供阅读，不是第二个编辑入口。
 - 新增迁移时重新拼接副本；`scripts/db/verify.mjs` 会检查一致性并在新建的临时数据库重放全部迁移。
 - 初始迁移依赖 Supabase 提供的 `auth.users`、`auth.uid()`、`anon` / `authenticated` / `service_role`，使用 PostgreSQL 15+ 的 `security_invoker` 视图。本地验证替换这些平台对象，不模拟完整 Supabase。
-- 初始迁移 `20261021000100` 已在真实项目执行，T07 已核实 migration list 与 dry-run up-to-date，并检查注册建档触发器、列权限、JWT / RLS 及测试账号删除级联。追加迁移 `20261022000100` 尚未部署；不得把基础迁移验证当成新 RPC 的云端证据。
+- 初始迁移 `20261021000100` 与追加迁移 `20261022000100` 已在真实项目执行。T07 / T08 分别核实 migration list 与 dry-run up-to-date；两个阶段均用本轮新建并清理的身份进行真实服务验证，详见对应回报及 `scripts/integration/README.md`。
 - 真实注册邮件送达与App会话由对应任务另测；云验证重放入口见scripts/integration/README.md。
 
 ## 表与客户端合同
@@ -53,7 +53,7 @@
 | `complete_plan(p_plan_id uuid, p_summary text = null)` | 单个 `plans` 复合对象 | 设为 completed，并原子处理总结；不要求已有打卡、不生成打卡或虚构分钟。允许再次保存完成状态 / 总结。 |
 | `get_checkin_streak(p_today date)` | integer | 调用者传设备展示时区的观察日期，只影响统计观察日；必须非空、有限，不授予时间写入权。按上节口径计算本人连续天数。 |
 
-Supabase 客户端通过 `.rpc('函数名', { p_plan_id: id, ... })` 使用上述准确参数名；不能传用户 ID、服务器时间、实时分钟数。补卡 numeric 接受 JSON 数字，非法小数不会被 integer 参数隐式四舍五入。
+Supabase 客户端通过 `.rpc('函数名', { p_plan_id: id, ... })` 使用上述准确参数名，写函数可追加 `.single()` 获取单对象，连续天数返回数字；不能传用户 ID、服务器时间、实时分钟数。补卡 numeric 接受 JSON 数字，非法小数不会被 integer 参数隐式四舍五入。
 
 总结统一规则：省略 / null 表示保留原总结；空字符串或纯空白明确清空为 SQL null；有内容去首尾空白后覆盖。修剪包括空格、制表 / 换行、不换行空格、全角空格等 ECMAScript trim 空白。2000字符按修剪后的内容检查，超限拒绝整个动作，不保留半条补卡或半完成状态。
 
@@ -79,4 +79,6 @@ PGlite 0.5.10 为 Apache-2.0 许可，运行 WASM 编译的 PostgreSQL 18.6；�
 
 当前42组检查包含旧24组和新增18组 RPC 边界。先用未经修改的迁移验证生产函数签名、授权、锁和真实服务器时刻；之后仅在一次性测试数据库替换两处时钟调用，精确覆盖开始前15分钟 / 开始 / 迟到1分钟 / 结束 / 0分钟、补卡168小时两端 / 超期 / 小数 / 重复、空总结、权限、快照与连续日期。测试时钟 schema 只存在于脚本创建的临时 DB，不在迁移中，不提供客户端传时间的生产入口。
 
-PGlite 单连接执行快速重复调用并验证唯一结果，不能证明两个独立事务的真实锁等待行为。新增 RPC 尚未做云端 JWT / PostgREST 调用或跨连接并发；本地脚本不验证 GoTrue、PostgREST、真实 JWT、云权限或网络。T07 的基础真实服务验证见对应回报，重放脚本见 `scripts/integration/README.md`。
+PGlite 单连接执行快速重复调用并验证唯一结果，不能证明两个独立事务的真实锁等待行为；本地脚本不验证 GoTrue、PostgREST、真实 JWT、云权限或网络。
+
+T08 另以真实测试项目执行8组 JWT / PostgREST RPC 检查。独立管理连接持计划行锁，另一连接通过 pg_blocking_pids 观察实时请求至少2个、补卡请求4个不同后端争锁，释放后分别得到单条原记录重放、一次成功加三次唯一冲突；两个临时身份最终删除并检查级联。生产函数未加测试时钟，TLS 使用官方固定指纹 CA 且保持证书验证。云端时间端点不人为伪造，精确边界证据仍来自本地测试。T07 的基础11组与 T08 云8组详见各自回报，重放命令见 `scripts/integration/README.md`。
