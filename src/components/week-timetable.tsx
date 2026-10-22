@@ -1,4 +1,4 @@
-import { TimeGrid } from '@symbiot.dev/react-native-timegrid';
+import { TimeGrid, type TimeGridEvent } from '@symbiot.dev/react-native-timegrid';
 import { addDays, format, startOfWeek } from 'date-fns';
 import { zhCN } from 'date-fns/locale/zh-CN';
 import { useState, type ReactNode } from 'react';
@@ -7,8 +7,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { theme } from '@/theme';
 
-export function WeekTimetable({ toolbar, notice }: { toolbar?: ReactNode; notice?: string }) {
-  const [weekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
+type Props = { toolbar?: ReactNode; notice?: string; navigation?: ReactNode; status?: ReactNode;
+  weekStart?: Date; timezone?: string; events?: TimeGridEvent[]; caption?: string;
+  onCreate?: (date: Date) => void; onSelect?: (id: string) => void };
+
+export function WeekTimetable({ toolbar, notice, navigation, status, weekStart: selectedWeek,
+  timezone, events, caption = '本周还没有学习计划', onCreate, onSelect }: Props) {
+  const [defaultWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const weekStart = selectedWeek ?? defaultWeek;
   // SSR viewport width is zero; mount the grid after measuring its container.
   const [gridWidth, setGridWidth] = useState(0);
   const weekEnd = addDays(weekStart, 6);
@@ -23,12 +29,19 @@ export function WeekTimetable({ toolbar, notice }: { toolbar?: ReactNode; notice
         <Text style={styles.dateRange}>
           {format(weekStart, 'M月d日')} — {format(weekEnd, 'M月d日')}
         </Text>
-        <Text style={styles.caption}>本周还没有学习计划</Text>
+        {navigation}
+        <Text style={styles.caption}>{caption}</Text>
         {notice && <Text style={styles.caption}>{notice}</Text>}
+        {status}
       </View>
       <View style={styles.grid} onLayout={({ nativeEvent }) => setGridWidth(nativeEvent.layout.width)}>
         {gridWidth > 0 && <TimeGrid
+          key={weekStart.toISOString()}
           startDate={weekStart}
+          timezone={timezone}
+          events={events}
+          onDatetimePress={onCreate ? ({ date }) => onCreate(date) : undefined}
+          onEventPress={onSelect ? ({ event }) => onSelect(event.id) : undefined}
           weekStartsOn={1}
           numberOfDays={7}
           width={gridWidth}
