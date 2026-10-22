@@ -1,4 +1,13 @@
 import type { ExpoConfig } from 'expo/config';
+import { parseSupabaseConfig } from './src/lib/supabase-config.ts';
+
+const publicKeys = [
+  process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+  process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+];
+if (publicKeys.some((key) => parseSupabaseConfig(undefined, key).kind === 'unsafe')) {
+  throw new Error('Supabase 服务端 Key 不能用于客户端公开配置。');
+}
 
 const config: ExpoConfig = {
   name: '研刻',
