@@ -15,10 +15,11 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      - run: npm ci --no-audit
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test:auth
+      - run: npm run test:plans
       - run: npx expo install --check
       - name: Render the app with a web export
         run: npx expo export --platform web --output-dir "$RUNNER_TEMP/yanke-web-export" --max-workers 2

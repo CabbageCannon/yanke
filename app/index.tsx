@@ -1,6 +1,5 @@
-import { WeekTimetable } from '@/components/week-timetable';
-import { AccountMenu } from '@/auth/auth-gate';
+import { PlansScreen } from '@/plans/plans-screen';
 
 export default function WeekScreen() {
-  return <WeekTimetable toolbar={<AccountMenu />} />;
+  return <PlansScreen />;
 }
