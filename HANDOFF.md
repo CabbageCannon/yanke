@@ -6,7 +6,7 @@
 **更新**：2026-10-22，主控 Agent
 **阶段**：正式研发：邮箱Auth与计划CRUD；完整 MVP 尚未交付
 **本阶段分支**：codex/feat-auth-plans；T07环境调查在codex/chore-service-readiness隔离worktree
-**本轮PR**：尚未创建，完成实现 / 独立审查后交付
+**本轮PR**：[PR #4](https://github.com/CabbageCannon/yanke/pull/4)，T05邮箱Auth / T07真实服务；当前提交CI与合并状态以GitHub为准
 **规则交付**：[PR #3](https://github.com/CabbageCannon/yanke/pull/3)已合并ad00493，无迟到宽限、总结可选
 **基础交付**：[PR #2](https://github.com/CabbageCannon/yanke/pull/2)已合并为991b1bb，PR与main两项CI均通过
 **前置规范提交**：PR #1 已通过 CI，合并为 b1bb007
