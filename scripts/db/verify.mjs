@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { verifyCheckinRpcs } from './verify-checkin-rpcs.mjs';
 
 // Install PGlite outside the application; pass its dist/index.js path as the only argument.
 if (!process.argv[2]) throw new Error('Usage: node scripts/db/verify.mjs <PGlite dist/index.js>');
@@ -245,6 +246,7 @@ try {
     }
     assert.deepEqual(await rows('select plan_id from public.checkins'), [{ plan_id: otherPlan }]);
   });
+  passed += await verifyCheckinRpcs(db, await readFile(resolve(migrationDir, '20261022000100_checkin_rpcs.sql'), 'utf8'));
   console.log(`${passed} checks passed. Supabase Auth/API/cloud deployment were not tested.`);
 } catch (error) {
   console.error(`${error.code ?? error.name}: ${error.message}`);
