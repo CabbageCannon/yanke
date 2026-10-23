@@ -20,6 +20,7 @@ const config: ExpoConfig = {
   android: {
     package: 'com.yanke.app',
     blockedPermissions: [
+      'android.permission.SYSTEM_ALERT_WINDOW',
       'android.permission.ACCESS_BACKGROUND_LOCATION',
       'android.permission.FOREGROUND_SERVICE_LOCATION',
       'android.permission.READ_EXTERNAL_STORAGE',
@@ -39,6 +40,7 @@ const config: ExpoConfig = {
         locationDescription: '仅在打卡时获取一次前台位置，以判断是否在计划围栏内。',
       },
     ],
+    './plugins/with-amap-android-dependencies.js',
   ],
 };
 
