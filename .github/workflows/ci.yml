@@ -20,6 +20,7 @@ jobs:
       - run: npm run typecheck
       - run: npm run test:auth
       - run: npm run test:plans
+      - run: npm run test:geofence
       - run: npx expo install --check
       - name: Render the app with a web export
         run: npx expo export --platform web --output-dir "$RUNNER_TEMP/yanke-web-export" --max-workers 2

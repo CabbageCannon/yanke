@@ -3,11 +3,11 @@
 状态入口，实际代码、命令结果和 Git / 云平台状态是完成证据。
 每阶段主控直接更新；详情看 docs/tasks/，方向决策看 docs/decisions.md。
 
-**更新**：2026-10-22，主控 Agent
+**更新**：2026-10-23，主控 Agent
 **阶段**：T06已合并PR #6；T10打卡 / 总结 / 统计客户端实现中，完整 MVP 尚未交付
 **本阶段分支**：codex/feat-study-loop-ui，基准main 45ff7f2；T08云脚本 / T09各在隔离worktree
 **账号阶段PR**：[PR #4](https://github.com/CabbageCannon/yanke/pull/4)两项CI通过，已合并5f6e465
-**打卡后端PR**：[PR #5](https://github.com/CabbageCannon/yanke/pull/5)两项CI通过，已合并c74e16e；云新增迁移已部署，8组真实RPC / 并发通过，codex/test-checkin-cloud脚本独立审查通过
+**打卡后端PR**：[PR #5](https://github.com/CabbageCannon/yanke/pull/5)已合并c74e16e；云迁移 / 8组真实RPC与并发通过，脚本已独立审查并经两项CI合并[PR #7](https://github.com/CabbageCannon/yanke/pull/7)为8ffeabf
 **计划阶段PR**：[PR #6](https://github.com/CabbageCannon/yanke/pull/6)两项CI通过，已合并45ff7f2，包含生产Web静态导出与8项计划测试
 **规则交付**：[PR #3](https://github.com/CabbageCannon/yanke/pull/3)已合并ad00493，无迟到宽限、总结可选
 **基础交付**：[PR #2](https://github.com/CabbageCannon/yanke/pull/2)已合并为991b1bb，PR与main两项CI均通过
@@ -20,7 +20,7 @@
 
 规范已先提交 GitHub，再通过子任务完成 Expo Router 空周网格与 Supabase 数据库基础。
 Expo58 / RN0.88 / React19.3；timegrid 精确固定0.2.2，高德模块2.3.1。
-T05 Auth、T06计划CRUD与T08 RPC源码已合并；T06最终生产Web静态导出已由CI通过。T08真实云8组及集成脚本独立审查通过；T09首轮原生编译遇Ninja260字符路径限制，已校验官方Ninja1.13.2替换工具链并重试。POI、打卡 / 总结 / 完整统计页面未交付，T10开始接入客户端，不能当作已完成MVP。
+T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本已合并；T06生产Web静态导出已由CI通过。T09替换校验后的官方Ninja1.13.2后原生代码编译通过，正处理高德组合SDK的R8缺类。T10客户端学习闭环收尾；T11高德独立模块首段已自测，独立审查中，UI尚未接入；尚无完整MVP。
 
 ## 2. 任务快照
 
@@ -34,11 +34,11 @@ T05 Auth、T06计划CRUD与T08 RPC源码已合并；T06最终生产Web静态导�
 | Day 1 原生定位 | 尚未交付，不得用JS打包替代 |
 | Day 2 计划CRUD | T06源码 / 5组真实云 / 浏览器 / 独立审查 / 两项CI通过，已合并PR #6 |
 | 云环境 / 会话 | T07真实云11组与独立审查通过，e03e92e已集成 |
-| Day 3 高德选点 / 围栏 | 未开始 |
-| Day 4 打卡 / 补卡 | T08本地42组 / 独立审查 / PR #5及云8组通过，云脚本审查通过；T10实现UI |
+| Day 3 高德选点 / 围栏 | T11首段模块15组自测 / 独立审查通过，真实Auth定向3项通过；两Key已填，待PR / 部署 / 接UI与真实搜索 |
+| Day 4 打卡 / 补卡 | T08本地42组 / 独立审查 / PR #5及云8组通过，云脚本已合并PR #7；T10实现UI |
 | Day 5 总结 / 统计 | T10客户端实现中；RPC与基础view可用 |
 | Day 6 体验 / 异常 | 未开始 |
-| Day 7 构建 / 设备验收 | T09在D:/yk-native编译Auth快照a1d3573，首轮Ninja长路径失败；不包含T06 |
+| Day 7 构建 / 设备验收 | T09在D:/yk-native编译Auth快照a1d3573；原生代码已通过，R8缺类修复中，暂无APK；不含T06 / T10 |
 
 ## 3. 验证证据
 
@@ -49,7 +49,7 @@ T05 Auth、T06计划CRUD与T08 RPC源码已合并；T06最终生产Web静态导�
 - SQL唯一来源 supabase/migrations；docs/schema.sql是受一致性检查的阅读副本。重放步骤见 docs/database.md。
 - T07：真实PG17.11 / GoTrue密码登录 / refresh / JWT / PostgREST双用户RLS等11组通过，临时两个账号清理并验证级联；独立审查通过。可重放脚本在scripts/integration，e03e92e。
 - T05：最终785包npm ci、lint / typecheck / 15Auth单测 / Expo匹配 / 无配置Web导出通过；真实UI登录 / 恢复 / 退出 / 失败重试通过，390 / 320可见网格无溢出及运行时异常。独立审查通过并重跑15单测 / typecheck，详见result / review。
-- T08：本地42组（旧24+新18）与独立重放全部通过，4个RPC审查无阻塞，PR #5已合并；真实PG17.11 / JWT / PostgREST云8组通过。独立连接实际观察实时2个、补卡4个后端争锁；释放后实时重放同一条、补卡1成功3冲突。临时2个身份与三表级联已清理，脚本独立审查通过。
+- T08：本地42组（旧24+新18）与独立重放全部通过，4个RPC审查无阻塞，PR #5已合并；真实PG17.11 / JWT / PostgREST云8组通过。独立连接实际观察实时2个、补卡4个后端争锁；释放后实时重放同一条、补卡1成功3冲突。临时2个身份与三表级联已清理，云脚本审查 / CI通过并合并PR #7。
 - T06：作者与独立审查均通过lint / typecheck / 8计划规则测试；作者真实云5组通过并清理临时身份。浏览器创建9–11数学 / 重载 / 编辑 / 重叠 / 软删 / 周切换 / 离线保留重试 / 旧周延迟响应通过，390 / 320无横向溢出。最终生产Web导出已由PR #6 CI通过；详见result / review。
 - 真实注册 / 重置邮件送达、高德原生定位、GCJ-02实际来源、APK / iOS / 真机和启动耗时均未验证；T07管理员确认沙箱不代表邮件注册送达。
 
@@ -67,16 +67,17 @@ T05 Auth、T06计划CRUD与T08 RPC源码已合并；T06最终生产Web静态导�
 - 用户已确认：开始前15分钟至开始时刻（含）为normal、取完整计划分钟；开始后至结束前为late、按实际打卡至结束计时，无宽限。
 - 用户已确认：总结可选，可以直接完成；补卡亦不强制总结。规则见PRD v0.4 / ADR-014，T08 RPC已部署并验证，客户端待接入。
 - Supabase现有CLI会话有效，已创建独立免费测试项目；T07准备忽略的客户端配置与沙箱凭据，不披露值。Expo CLI未登录，高德Key仍未取得。
-- 高德控制台实查无可用登录、需账号及本人验证；本项目忽略配置未发现高德Key。已请用户将AMAP_WEB_SERVICE_KEY / AMAP_ANDROID_KEY填入忽略的.env.amap.local；只阻塞真实POI / 定位。测试包com.yanke.app，debug SHA1为5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25，非正式发布签名。
+- 用户于2026-10-23回复“已配置”，本机.env.amap.local中Web服务 / Android两Key已用布尔与格式检查确认，未输出值；真实搜索 / 设备定位仍待验。测试包com.yanke.app，debug SHA1为5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25，T09已从keystore只读复核一致，非正式发布签名。该自定义文件不会自动被Expo加载，Web Key仅进Edge secrets，原生Key独立注入。
 - 先自主检查可用登录 / CLI并完成独立工作；确需秘密 / 邮箱确认 / MFA时才报告最小动作，不披露值。
 
 ## 6. 已知限制
 
 - timegrid0.2.3/0.2.4发布包Context分裂，不能盲升；0.2.2保持精确固定，详见ADR-012。
 - T05当前npm audit为19 high、0 moderate、0 critical（braces / node-forge两条工具链根公告），不force降级Expo；旧T01的26项是当时结果，发布前复核当前锁文件。
-- 高德配置 / JS打包不等于原生可用；JDK17 / Android CLI / adb已验证，SDK37.0 / build-tools37及36 / NDK27.1 / CMake3.22.1已安装；T09已跑实际编译，Ninja260字符路径失败待修复，无已连接设备。Windows无本机iOS编译，EAS / Apple未验证。
+- 高德配置 / JS打包不等于原生可用；JDK17 / Android CLI / adb已验证，SDK37.0 / build-tools37及36 / NDK27.1 / CMake3.22.1已安装；Ninja260字符路径已修复，暂无已连接设备。Windows无本机iOS编译，EAS / Apple未验证。
 - 打卡直接客户端写被禁止；T08业务RPC和连续天数已云验证，UI未接入。T09快照无T06及后续功能，不能当作完整MVP候选。
-- 高德Web服务Key只放服务端，原生Key独立注入；仅一次前台定位，不存实际位置 / 轨迹。
+- T09原生代码越过长路径问题后编译通过，R8收缩阶段报告高德SDK缺com.amap.ams.gnss.GnssSoftLocator / net.jafama.FastMath；先用CLI关闭收缩产内部Auth包，正式R8及地图运行待验。SYSTEM_ALERT_WINDOW已授权通过源配置阻断并重生成，最终APK核验尚未完成。
+- 高德Web服务Key只放服务端，原生Key独立注入；仅一次前台定位，不存实际位置 / 轨迹。平台选择与本机填写说明见[高德配置](docs/amap-setup.md)。
 
 ## 7. 授权与接力
 
@@ -90,6 +91,6 @@ T05 Auth、T06计划CRUD与T08 RPC源码已合并；T06最终生产Web静态导�
 
 1. 先读AGENTS、本文、DEVELOPMENT、agent-workflow，核对git status / log / PR，避免重复初始化或清理未知改动。
 2. T06已合并；主目录T10新分支由子任务实现打卡 / 完成 / 统计UI，冻结后独立审查及适用CI，不清理未知文件。
-3. T08云验收脚本codex/test-checkin-cloud独立审查通过，完成其PR CI后合并；不用重复部署已一致的迁移或初始化T07。
-4. 新分支分派T10打卡 / 完成 / 统计UI，再按T11接入高德POI / 前台定位；T09修复原生长路径并复验。秘密缺口只阻塞依赖任务。
+3. T08云脚本已合并PR #7；T10 / T11冻结后同步最新main，不用重复部署已一致的迁移或初始化T07。
+4. T11模块审查通过后集成，再接高德POI / 前台定位UI与部署单函数；T09核对组合SDK后补可复现配置并验证R8，最终源码另编MVP候选。秘密缺口只阻塞依赖任务。
 5. 后续Agent自行处理CLI / 工具链安装，不把常规下载与排错退回用户。

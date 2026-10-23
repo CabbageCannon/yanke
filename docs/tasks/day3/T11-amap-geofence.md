@@ -1,9 +1,9 @@
 # T11 高德POI代理与可选前台围栏
 
-- 状态：planned；待主控创建隔离分支、稳定客户端计划接口后分派。缺Key只阻塞真实服务 / 定位验收，不阻塞实现和替身验证。
-- 阶段 / 分支 / 基准：Day 3，计划codex/feat-amap-geofence；开工记录实际基准 / worktree，禁止与其他Agent写同一文件。
+- 状态：in_progress；2026-10-23首段独立POI服务 / 围栏纯函数及前台定位模块自测与独立审查通过，准备集成。T10详情界面未冻结前不改客户端界面，后续由主控同步main后再串行接入，不能把首段交付当完整Day 3验收。
+- 阶段 / 分支 / 基准：Day 3，codex/feat-amap-geofence；基准main45ff7f2，复用隔离worktree D:/yanke-service-readiness，禁止改主目录源码 / 分支 / index。
 - 依赖：T06计划 / 围栏字段、T10打卡入口；Supabase免费测试项目已就绪。AMAP_WEB_SERVICE_KEY只在服务端，AMAP_ANDROID_KEY / AMAP_IOS_KEY只用于原生构建配置；真实值从忽略文件安全读取，不进Git或报告。
-- 本机凭据入口为忽略的.env.amap.local（主控已建立空模板，用户待填）；该自定义文件名不会自动被Expo加载，构建只显式注入原生Key，服务Key只上传Edge secrets，不把整份文件复制进Expo public配置。
+- 本机凭据入口为忽略的.env.amap.local；用户于2026-10-23已填写Web服务 / Android两Key，主控仅检查配置状态与格式，真实服务待验。该自定义文件名不会自动被Expo加载，构建只显式注入原生Key，服务Key只上传Edge secrets，不把整份文件复制进Expo public配置。
 - 目标：鉴权高德POI搜索、选择名称 / 地址 / GCJ-02中心、半径50–1000米默认200米；打卡点击时一次前台定位，距离≤半径才调用实时RPC。
 - 写入范围：supabase/functions/、app/、src/、必要测试 / 配置 / 部署文档与本任务result；不改旧迁移、HANDOFF或产品范围。新依赖复用现有expo-gaode-map2.3.1能力，先核查真实API和Expo58兼容性。
 - 代理：验证真实用户JWT后才调用固定高德POI端点；限制词长 / 页数 / 超时，返回最少字段并显式处理限额 / 服务失败。拒绝任意URL、空查询、伪JWT；不记录token或完整高德Key。无服务Key返回可解释的不可用响应，不能造假地点结果。部署前只部署本函数，不覆盖项目Auth配置。
