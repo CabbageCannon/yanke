@@ -2,7 +2,7 @@ import type { ExpoGaodeMapModule } from 'expo-gaode-map/build/ExpoGaodeMapModule
 
 import { isGCJ02Coordinate, type LocationFix } from './domain.ts';
 
-export type LocationSdk = Pick<ExpoGaodeMapModule, 'getPrivacyStatus' | 'isNativeSDKConfigured' |
+export type LocationSdk = Pick<ExpoGaodeMapModule, 'getPrivacyStatus' | 'setPrivacyConfig' | 'isNativeSDKConfigured' |
   'isSDKInitialized' | 'initSDK' | 'checkLocationPermission' | 'requestLocationPermission' |
   'setAllowsBackgroundLocationUpdates' | 'setLocatingWithReGeocode' | 'setLocationMode' |
   'setHttpTimeOut' | 'setDesiredAccuracy' | 'setLocationTimeout' | 'getCurrentLocation'>;
@@ -27,9 +27,11 @@ async function bounded<T>(operation: Promise<T>, signal: AbortSignal): Promise<T
 
 // Caller supplies an abort signal tied to foreground state; abort never claims to cancel the native single request.
 export async function requestSingleForegroundLocation(sdk: LocationSdk, platform: 'android' | 'ios',
-  signal: AbortSignal): Promise<LocationResult> {
+  signal: AbortSignal, consent?: boolean): Promise<LocationResult> {
   if (signal.aborted) return failure('background', '请回到前台后重新打卡。');
   try {
+    if (consent !== undefined) sdk.setPrivacyConfig({ hasShow: true, hasContainsPrivacy: true,
+      hasAgree: consent, privacyVersion: 'yanke-foreground-2026-10-23' });
     if (!sdk.getPrivacyStatus().isReady) return failure('privacy', '请先阅读并同意本次高德定位的隐私说明。');
     if (!sdk.isNativeSDKConfigured()) return failure('unconfigured', '此安装包未配置高德原生定位Key。');
     if (!sdk.isSDKInitialized()) sdk.initSDK({});

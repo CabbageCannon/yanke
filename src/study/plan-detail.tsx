@@ -1,8 +1,10 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { format } from 'date-fns';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, AppState, Linking, Pressable, Text, TextInput, View } from 'react-native';
 
+import { verifyCheckinLocation } from '@/geofence/checkin-location';
+import { getForegroundLocation, locationSupportError } from '@/geofence/location';
 import type { SessionScope } from '@/lib/auth-session';
 import type { Plan } from '@/plans/plan-domain';
 import { theme } from '@/theme';
@@ -24,6 +26,7 @@ export function PlanDetail({ initialPlan, client, scope, onClose, onEdit, onChan
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [retry, setRetry] = useState(0);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
   const pending = useRef(false), mounted = useRef(false), generation = useRef(0);
   const needsReconcile = useRef(false);
   useEffect(() => {
@@ -39,14 +42,13 @@ export function PlanDetail({ initialPlan, client, scope, onClose, onEdit, onChan
     return () => { mounted.current = false; };
   }, [client, scope, initialPlan.id, retry]);
 
-  const submit = async (action: Action) => {
+  const submit = async (action: Action, consent?: boolean) => {
     if (pending.current || busy || !state || !scope.isCurrent()) return;
-    if (action === 'checkin' && state.plan.geofence_enabled) return;
     const duration = validateMinutes(minutes);
     const summaryError = action === 'checkin' ? null : validateSummary(summary);
     if (summaryError) { setError(summaryError); return; }
     if (action === 'makeup' && !duration.ok) { setError(duration.error); return; }
-    pending.current = true; setBusy(true); setError(null); setNotice(null);
+    pending.current = true; setBusy(true); setError(null); setNotice(null); setPrivacyOpen(false);
     const sequence = ++generation.current;
     const current = () => mounted.current && scope.isCurrent() && sequence === generation.current;
     let observed = state;
@@ -56,16 +58,31 @@ export function PlanDetail({ initialPlan, client, scope, onClose, onEdit, onChan
         observed = await loadStudyPlan(client, scope.userId, state.plan.id);
         if (!current()) return;
         setState(observed); onChanged(observed.plan); needsReconcile.current = false;
-        if (action === 'makeup' && observed.checkin) {
-          setNotice('已读取到已保存的打卡，未再次提交补卡。'); return;
-        }
       }
       if (!current()) return;
+      if ((action === 'checkin' || action === 'makeup') && observed.checkin) {
+        setNotice(`已读取到${checkinLabels[observed.checkin.type]}：${observed.checkin.duration_minutes}分钟；未再次提交打卡。`);
+        return;
+      }
+      if (action === 'checkin' && observed.plan.geofence_enabled && consent === undefined) {
+        const unsupported = locationSupportError();
+        if (unsupported) setError(unsupported);
+        else setPrivacyOpen(true);
+        return;
+      }
+      let geofenceVerified = false;
+      if (action === 'checkin' && !observed.checkin) {
+        const verification = await verifyCheckinLocation(observed.plan, () => getForegroundLocation(consent === true),
+          () => current() && (!observed.plan.geofence_enabled || AppState.currentState === 'active'));
+        if (!current()) return;
+        if (!verification.ok) { setError(verification.error); return; }
+        geofenceVerified = verification.verified;
+      }
       const submittedSummary = dirty ? summary : null;
       if (action === 'complete') {
         observed = { ...observed, plan: await completePlan(client, observed.plan.id, submittedSummary) };
       } else {
-        const checkin = action === 'checkin' ? await checkInPlan(client, observed.plan.id) :
+        const checkin = action === 'checkin' ? await checkInPlan(client, observed.plan.id, geofenceVerified) :
           await makeupPlan(client, observed.plan.id, duration.ok ? duration.minutes : 0, submittedSummary);
         observed = { plan: action === 'makeup' && submittedSummary !== null ?
           { ...observed.plan, summary: submittedSummary.trim() || null } : observed.plan, checkin };
@@ -105,18 +122,33 @@ export function PlanDetail({ initialPlan, client, scope, onClose, onEdit, onChan
           <Text style={styles.title}>{state.plan.subject}{state.plan.title ? ` · ${state.plan.title}` : ''}</Text>
           <Text style={styles.label}>{format(new Date(state.plan.start_at), 'M/d HH:mm')}–{format(new Date(state.plan.end_at), 'HH:mm')}</Text>
           <Text style={styles.label}>{state.plan.status === 'completed' ? '✓ 已完成' : '待手动完成'}</Text>
-          <Text style={styles.helper}>{state.plan.geofence_enabled ? `地点：${state.plan.geofence_name}` : '未绑定地点，无需定位。'}</Text>
+          <Text style={styles.helper}>{state.plan.geofence_enabled ? `地点：${state.plan.geofence_name} · ${state.plan.geofence_radius}米` : '未绑定地点，无需定位。'}</Text>
           <Text style={styles.label}>{state.checkin ? `${checkinLabels[state.checkin.type]} · ${state.checkin.duration_minutes}分钟` : '尚未打卡 · 0分钟'}</Text>
           {state.checkin && <Text style={styles.helper}>归属学习日：{state.checkin.study_date}；打卡与完成分别记录。</Text>}
         </View>
         {!state.checkin && <>
-          {state.plan.geofence_enabled && <Text style={styles.helper}>此计划需要真实前台围栏判断。定位功能尚未接入，暂不可实时打卡；可在计划结束后补卡。</Text>}
-          <Pressable accessibilityRole="button" disabled={busy || state.plan.geofence_enabled}
-            accessibilityState={{ disabled: busy || state.plan.geofence_enabled }}
-            style={[styles.button, (busy || state.plan.geofence_enabled) && styles.disabled]} onPress={() => { void submit('checkin'); }}>
+          {state.plan.geofence_enabled && <Text style={styles.helper}>实时打卡会请求一次前台位置；需在地点围栏内且定位精度足够。Web和Expo Go不支持此原生能力。</Text>}
+          <Pressable accessibilityRole="button" disabled={busy}
+            accessibilityState={{ disabled: busy }}
+            style={[styles.button, busy && styles.disabled]} onPress={() => { void submit('checkin'); }}>
             <Text style={styles.primaryText}>实时打卡</Text>
           </Pressable>
           <Text style={styles.helper}>开始前15分钟至结束前可打卡。开始后按剩余分钟记录，无迟到宽限；以服务器时间为准。</Text>
+          {privacyOpen && <View style={styles.card}>
+            <Text accessibilityRole="header" style={styles.label}>本次前台定位说明</Text>
+            <Text style={styles.helper}>研刻将使用高德定位SDK获取一次精确位置，仅在本机判断你是否在该学习地点的围栏内。高德SDK处理位置与必要设备 / 网络信息以提供定位服务；研刻不上传或保存你的实际坐标，不采集后台位置或轨迹。系统可能请求前台位置权限。拒绝仍可补卡、完成或编辑计划。</Text>
+            <Pressable accessibilityRole="link" style={styles.textButton} onPress={() => {
+              void Linking.openURL('https://lbs.amap.com/pages/privacy/').catch(() => {
+                if (mounted.current && scope.isCurrent()) setError('隐私政策暂未打开，请检查网络后重试。');
+              });
+            }}><Text style={styles.link}>阅读高德隐私政策</Text></Pressable>
+            <Pressable accessibilityRole="button" style={styles.button} onPress={() => { void submit('checkin', true); }}>
+              <Text style={styles.primaryText}>同意并获取本次位置</Text>
+            </Pressable>
+            <Pressable accessibilityRole="button" style={styles.textButton} onPress={() => { void submit('checkin', false); }}>
+              <Text style={styles.link}>不同意，本次不定位</Text>
+            </Pressable>
+          </View>}
         </>}
         <Text style={styles.label}>小总结（可选）</Text>
         <TextInput accessibilityLabel="小总结" value={summary} onChangeText={(value) => {

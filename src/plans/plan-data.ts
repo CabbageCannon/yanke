@@ -1,8 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { GeofenceFields } from '../geofence/domain.ts';
 
 import type { Plan, PlanValues } from './plan-domain.ts';
 
-export const planColumns = 'id,user_id,subject,title,start_at,end_at,timezone,status,summary,geofence_enabled,geofence_name';
+export const planColumns = 'id,user_id,subject,title,start_at,end_at,timezone,status,summary,geofence_enabled,geofence_name,geofence_lat,geofence_lng,geofence_radius';
 
 export async function loadPlans(client: SupabaseClient, userId: string, from: string, to: string): Promise<Plan[]> {
   const { data, error } = await client.from('plans').select(planColumns).eq('user_id', userId)
@@ -11,7 +12,7 @@ export async function loadPlans(client: SupabaseClient, userId: string, from: st
   return data as Plan[];
 }
 
-export async function savePlan(client: SupabaseClient, userId: string, id: string, values: PlanValues,
+export async function savePlan(client: SupabaseClient, userId: string, id: string, values: PlanValues & GeofenceFields,
   timezone: string, create: boolean): Promise<{ plan: Plan; overlap: boolean }> {
   const conflict = await client.from('plans').select('id').eq('user_id', userId).neq('status', 'deleted')
     .neq('id', id).lt('start_at', values.end_at).gt('end_at', values.start_at).limit(1);
