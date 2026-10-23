@@ -19,7 +19,7 @@ flowchart LR
 - 客户端：周网格、表单、一次定位、围栏距离判断、手写总结和轻量统计展示。
 - Auth / 数据库：邮箱密码、会话、本人数据隔离、唯一记录与有效状态约束。
 - RPC：服务器时间判断、时长计算、幂等写入、补卡边界、完成状态更新；T08已部署并完成真实云验收，客户端由T10接入。
-- 后续 Edge Function：验证用户并代理 POI，隐藏 Web 服务 Key；不新建独立常驻后端。
+- Edge Function：验证用户并代理 POI，隐藏 Web 服务 Key；T11已部署并通过真实搜索及401 / 400验证，不新建独立常驻后端。
 - 管理：使用 Supabase Studio，不做第一周 Web 后台。
 
 ## 2. 客户端基础
@@ -28,7 +28,7 @@ flowchart LR
 - Expo / React / React Native 与原生依赖采用匹配版本，提交 lockfile；以 npm ci 复现。
 - T01 基础为 Expo58 / RN0.88 / React19.3；timegrid0.2.3/0.2.4有发布Context缺陷，已精确固定0.2.2并通过Web静态渲染与Android JS/Hermes导出，详见 ADR-012 和最终回报。
 - 时间表优先实际验证 @symbiot.dev/react-native-timegrid；初始化不仅看 peer 范围，还要导入和打包。
-- 高德原生候选 expo-gaode-map；核查插件入口、权限、Key 注入、SDK / 新架构要求。
+- 高德采用expo-gaode-map2.3.1；T09真实R8 release构建已验证插件与依赖，T11客户端已接入一次前台定位。实际设备权限、坐标和运行仍待验，不能用构建代替。
 - T05已接入Supabase官方JS客户端、AsyncStorage会话持久化、URL polyfill、邮箱Auth界面和AppState刷新管理；挂载后创建客户端以避免SSR触碰存储。SDK2.118使用内置刷新协调，不再添加deprecated processLock。
 - 个人页面受会话边界保护：退出 / 切账号清空个人子树，旧请求通过scope失效；同账号正常刷新不重挂载或丢失编辑内容。T06个人数据请求需检查scope.isCurrent()后再回填。
 - MVP 不引入全局状态框架、离线写队列或后台定位服务；先用组件状态 / 简单业务 hooks。
@@ -42,7 +42,7 @@ src/components/           时间表、计划表单、状态组件
 src/lib/                  Supabase、配置、时间 / 围栏纯函数
 src/hooks/                计划、会话等真正复用的状态
 supabase/migrations/      数据库迁移（唯一 SQL 来源）
-supabase/functions/       后续 POI 代理等函数
+supabase/functions/       鉴权 POI 代理
 docs/tasks/               子任务、回报、独立审查
 ```
 
@@ -75,8 +75,8 @@ Schema禁止客户端直接写checkins。T08四RPC已部署并完成8组真实JW
 
 - 原生 SDK Key 和 Web 服务 Key 分开配置。原生 Key 绑定包名 / 签名，是原生包配置的一部分，不能当作服务器秘密。
 - Web 服务 Key 仅在 Supabase Edge Function secrets，绝不使用 EXPO_PUBLIC_AMAP_WEB_KEY。
-- POI 代理接受用户搜索词和可选城市 / 区域，验证 Supabase JWT 后调用固定高德端点。
-- 后续实现限制参数长度、分页和超时，返回最少字段，处理限额 / 失败；不能变成任意 URL 代理。
+- POI 代理接受用户搜索词和页码，验证 Supabase JWT 后调用固定高德端点。
+- 已限制参数长度、分页和超时，返回最少字段，处理限额 / 失败；不能变成任意 URL 代理。
 - 高德国内 POI 与定位统一使用 GCJ-02。若返回 WGS-84，需显式转换或使用 SDK 一致模式；不能混算后声称 200m 正确。
 - 距离用 Haversine，判定距离 ≤ radius。定位权限拒绝 / 超时 / 精度不足时提示重试，不伪造到达。
 - 不保存实际用户位置、轨迹和离开事件，不申请后台位置权限。

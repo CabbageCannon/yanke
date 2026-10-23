@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-Expo Router应用、Supabase邮箱账号和云端数据库基础已建立；登录后展示本周空时间表，计划CRUD按T06继续。完整 MVP 尚未完成。
+邮箱账号、周网格计划CRUD、高德POI选点与可选围栏、实时打卡 / 七天补卡、可选总结和统计客户端均已合并。Supabase测试项目的迁移、可信RPC和鉴权POI代理已部署并分别通过真实服务验证；正在完成集成体验检查与完整业务Android候选构建。
 [HANDOFF.md](HANDOFF.md) 提供最新状态与验证证据，不能仅凭 scripts 判断可启动。
 已连接 [GitHub](https://github.com/CabbageCannon/yanke)，无需重新 clone。
 
@@ -29,19 +29,25 @@ timegrid 0.2.3 / 0.2.4 发布包存在 Context 分裂，不能盲升；原因见
 ```powershell
 npm ci
 npm run start
-# Web 骨架预览
+# Web 业务界面预览（不支持原生高德定位）
 npm run web
 # 静态检查
 npm run lint
 npm run typecheck
+npm run test:auth
+npm run test:plans
+npm run test:geofence
+npm run test:study
 npx expo install --check
 npx expo-doctor
 ```
 
-无密钥可运行当前静态时间表。需要接真实服务时，从 .env.example 生成忽略的本地配置或使用平台 secrets，不提交真实值。
+无云配置时显示明确的基础骨架与未配置提示，不模拟登录或保存。需要接真实服务时，从 .env.example 生成忽略的本地配置或使用平台 secrets，不提交真实值。高德两类Key的平台选择及注入边界见[高德配置](docs/amap-setup.md)。
 `npm run android` / `npm run ios` 是原生 development build 命令，需要相应工具链；Windows 无法本机构建 iOS。
 高德 JS 配置检查和 Android JS / Hermes 打包不等于已构建 APK 或验证真机定位。
-已实现邮箱注册 / 登录 / 退出、持久会话和账号切换隔离；真实注册确认邮件送达尚未验证。当前没有计划CRUD、打卡 / 总结 / 完整统计页面或POI代理；后端RPC进度见HANDOFF。
+Web已验证真实登录、计划持久化、无围栏学习闭环、POI选点和围栏编辑；原生围栏打卡须使用Android安装包，Web / Expo Go会明确提示能力限制。T09已有原生release构建证据，但它是旧Auth快照，不能当作完整业务候选。
+
+原生设备定位 / 权限、安装与冷 / 热启动、真实注册 / 重置邮件送达及iOS仍待验；正式上线隐私政策与受保护的账号注销路径亦未完成。当前锁文件保留19项high上游工具链依赖风险，详见HANDOFF；不将内部测试版本视为商店发布版本。
 
 ## Agent 接手
 
@@ -59,7 +65,7 @@ npx expo-doctor
 - [技术架构](docs/architecture.md)
 - [七天任务总览](docs/tasks.md) 与 [任务目录](docs/tasks/)
 - [数据库 Schema 阅读副本](docs/schema.sql)
-- [数据库迁移与24组本地验证](docs/database.md)
+- [数据库迁移与本地 / 云验证](docs/database.md)
 - [设计 token](docs/design-tokens.md)
 - [决策记录](docs/decisions.md)
 

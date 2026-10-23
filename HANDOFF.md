@@ -4,14 +4,15 @@
 每阶段主控直接更新；详情看 docs/tasks/，方向决策看 docs/decisions.md。
 
 **更新**：2026-10-23，主控 Agent
-**阶段**：T10已合并PR #9、T09配置已合并PR #10；T11客户端修复后独审通过，已集成待远程CI；完整 MVP 尚未交付
-**本阶段分支**：主控codex/docs-geofence-delivery，基准main 18d6792；UI在codex/feat-geofence-ui；原生构建证据来自隔离分支codex/chore-android-build
+**阶段**：T11客户端修复 / 独审 / 两项CI通过并合并PR #11；执行T12体验收尾，完整 MVP 尚未交付
+**本阶段分支**：主控codex/docs-mvp-readiness，基准main83ed260；T12在codex/fix-mvp-experience；原生构建证据来自隔离分支codex/chore-android-build
 **账号阶段PR**：[PR #4](https://github.com/CabbageCannon/yanke/pull/4)两项CI通过，已合并5f6e465
 **打卡后端PR**：[PR #5](https://github.com/CabbageCannon/yanke/pull/5)已合并c74e16e；云迁移 / 8组真实RPC与并发通过，脚本已独立审查并经两项CI合并[PR #7](https://github.com/CabbageCannon/yanke/pull/7)为8ffeabf
 **计划阶段PR**：[PR #6](https://github.com/CabbageCannon/yanke/pull/6)两项CI通过，已合并45ff7f2，包含生产Web静态导出与8项计划测试
 **高德模块PR**：[PR #8](https://github.com/CabbageCannon/yanke/pull/8)独立审查 / 两项CI通过，已合并622b025；代理version2已部署，真实搜索20条与401 / 400检查通过，UI未接入
 **学习闭环PR**：[PR #9](https://github.com/CabbageCannon/yanke/pull/9)独立审查 / 两项CI通过，已合并f8958e1，包含无围栏打卡 / 补卡 / 完成 / 总结与统计
 **原生兼容PR**：[PR #10](https://github.com/CabbageCannon/yanke/pull/10)独审 / 两项CI通过，已合并18d6792；可复现高德R8依赖与权限修复，实际Auth快照APK静态验收通过
+**围栏客户端PR**：[PR #11](https://github.com/CabbageCannon/yanke/pull/11)修复后独审 / 两项CI通过，已合并83ed260；真实选点 / 围栏CRUD与拒绝 / 重试保护，设备定位待验
 **规则交付**：[PR #3](https://github.com/CabbageCannon/yanke/pull/3)已合并ad00493，无迟到宽限、总结可选
 **基础交付**：[PR #2](https://github.com/CabbageCannon/yanke/pull/2)已合并为991b1bb，PR与main两项CI均通过
 **前置规范提交**：PR #1 已通过 CI，合并为 b1bb007
@@ -23,7 +24,7 @@
 
 规范已先提交 GitHub，再通过子任务完成 Expo Router 空周网格与 Supabase 数据库基础。
 Expo58 / RN0.88 / React19.3；timegrid 精确固定0.2.2，高德模块2.3.1。
-T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本、T10学习闭环、T09原生构建配置均已合并。T11客户端真实POI / 围栏CRUD / 旧响应隔离浏览器检查通过；独审P2已修复并补实际TSX回归，定向复查通过，集成e82f419待CI。尚无完整MVP。
+T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本、T10学习闭环、T09原生构建配置、T11围栏客户端均已合并。T11真实POI / 围栏CRUD / 旧响应隔离通过；独审P2已修复并补实际TSX回归。T12检查最终集成体验，尚无完整MVP设备验收。
 
 ## 2. 任务快照
 
@@ -37,10 +38,10 @@ T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本、T10学习闭环、T09原�
 | Day 1 原生定位 | 尚未交付，不得用JS打包替代 |
 | Day 2 计划CRUD | T06源码 / 5组真实云 / 浏览器 / 独立审查 / 两项CI通过，已合并PR #6 |
 | 云环境 / 会话 | T07真实云11组与独立审查通过，e03e92e已集成 |
-| Day 3 高德选点 / 围栏 | T11首段PR #8已合并 / 部署；UI真实搜索 / 围栏保存移除通过，修复后独审通过，待CI；设备定位待验 |
+| Day 3 高德选点 / 围栏 | T11首段PR #8已合并 / 部署；UI修复后独审 / 两项CI通过，已合并PR #11；设备定位待验 |
 | Day 4 打卡 / 补卡 | T08云验收已通过；T10客户端8项 / 独立审查 / 最终Web浏览器 / 两项CI通过，已合并PR #9 |
 | Day 5 总结 / 统计 | T10可选总结 / 统计 / 旧会话隔离已合并PR #9 |
-| Day 6 体验 / 异常 | T12任务卡已准备，完整围栏UI稳定后执行 |
+| Day 6 体验 / 异常 | T12进行中，基准main83ed260；复用已有证据，只补最终集成交互 |
 | Day 7 构建 / 设备验收 | T09实际release / APK静态核验及独审通过，配置已合并PR #10；Auth快照不含T06 / T10 / T11，最终MVP另编 |
 
 ## 3. 验证证据
@@ -96,7 +97,7 @@ T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本、T10学习闭环、T09原�
 ## 8. 下一步
 
 1. 先读AGENTS、本文、DEVELOPMENT、agent-workflow，核对git status / log / PR，避免重复初始化或清理未知改动。
-2. T10已合并；T11客户端修复 / 独审通过，e82f419已集成，待PR / CI；保留已部署代理和双方检查，不清理未知文件。
+2. T10 / T11已合并；T12在隔离目录检查最终体验，冻结后独审 / CI；保留已部署代理和双方检查，不清理未知文件。
 3. T08云脚本已合并PR #7；T10 / T11冻结后同步最新main，不用重复部署已一致的迁移或初始化T07。
 4. T09配置已合并PR #10；T11客户端修复复审 / 合并后执行T12与T13最终Android候选。已询问用户安卓设备可用性；缺设备只阻塞原生定位 / 启动验证，邮件送达亦单列未测。
 5. 后续Agent自行处理CLI / 工具链安装，不把常规下载与排错退回用户。
