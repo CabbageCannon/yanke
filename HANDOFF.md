@@ -4,24 +4,25 @@
 每阶段主控直接更新；详情看 docs/tasks/，方向决策看 docs/decisions.md。
 
 **更新**：2026-10-23，主控 Agent
-**阶段**：T10打卡 / 总结 / 统计客户端自测与独立审查通过，待PR CI；完整 MVP 尚未交付
-**本阶段分支**：codex/feat-study-loop-ui，基准main 45ff7f2；T08云脚本 / T09各在隔离worktree
+**阶段**：T10已合并PR #9；T11选点 / 围栏打卡UI实现中，T09首个release构建 / 静态验收与独审通过，配置待PR CI；完整 MVP 尚未交付
+**本阶段分支**：主控codex/build-android-compat，基准main f8958e1；UI在codex/feat-geofence-ui；原生构建证据来自隔离分支codex/chore-android-build
 **账号阶段PR**：[PR #4](https://github.com/CabbageCannon/yanke/pull/4)两项CI通过，已合并5f6e465
 **打卡后端PR**：[PR #5](https://github.com/CabbageCannon/yanke/pull/5)已合并c74e16e；云迁移 / 8组真实RPC与并发通过，脚本已独立审查并经两项CI合并[PR #7](https://github.com/CabbageCannon/yanke/pull/7)为8ffeabf
 **计划阶段PR**：[PR #6](https://github.com/CabbageCannon/yanke/pull/6)两项CI通过，已合并45ff7f2，包含生产Web静态导出与8项计划测试
 **高德模块PR**：[PR #8](https://github.com/CabbageCannon/yanke/pull/8)独立审查 / 两项CI通过，已合并622b025；代理version2已部署，真实搜索20条与401 / 400检查通过，UI未接入
+**学习闭环PR**：[PR #9](https://github.com/CabbageCannon/yanke/pull/9)独立审查 / 两项CI通过，已合并f8958e1，包含无围栏打卡 / 补卡 / 完成 / 总结与统计
 **规则交付**：[PR #3](https://github.com/CabbageCannon/yanke/pull/3)已合并ad00493，无迟到宽限、总结可选
 **基础交付**：[PR #2](https://github.com/CabbageCannon/yanke/pull/2)已合并为991b1bb，PR与main两项CI均通过
 **前置规范提交**：PR #1 已通过 CI，合并为 b1bb007
 **仓库**：https://github.com/CabbageCannon/yanke （公开）
 **测试Supabase**：yanke-dev，Tokyo（ap-northeast-1），ref jhaxdxokcszbbkbvagtl，基础迁移已部署；真实云11组检查通过
-**安装包 / 原生验收**：无
+**安装包 / 原生验收**：T09 Auth快照ARM64 release，R8 / 签名 / 权限 / Hermes / 许可静态核验与独审通过；约62.5MiB，无设备验收，完整业务候选另编
 
 ## 1. 当前产物
 
 规范已先提交 GitHub，再通过子任务完成 Expo Router 空周网格与 Supabase 数据库基础。
 Expo58 / RN0.88 / React19.3；timegrid 精确固定0.2.2，高德模块2.3.1。
-T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本已合并。T09原生代码编译通过，最小高德R8配置修复已进入实际构建。T10学习闭环源码冻结、自测与独立审查通过，待PR CI；T11高德首段已合并，代理部署并通过真实搜索，UI尚未接入；尚无完整MVP。
+T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本、T10学习闭环均已合并。T09最小高德R8配置修复、实际minify=true release与最终APK静态核验均独审通过；配置已集成最新源码待PR CI。T11高德首段已合并部署、真实搜索通过，客户端正在隔离分支接入；尚无完整MVP。
 
 ## 2. 任务快照
 
@@ -35,11 +36,11 @@ T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本已合并。T09原生代码�
 | Day 1 原生定位 | 尚未交付，不得用JS打包替代 |
 | Day 2 计划CRUD | T06源码 / 5组真实云 / 浏览器 / 独立审查 / 两项CI通过，已合并PR #6 |
 | 云环境 / 会话 | T07真实云11组与独立审查通过，e03e92e已集成 |
-| Day 3 高德选点 / 围栏 | T11首段PR #8已合并 / 部署，真实代理4项通过；待接UI及设备前台定位 |
-| Day 4 打卡 / 补卡 | T08云验收已通过；T10客户端8项 / 独立审查 / 最终Web浏览器通过，待PR CI |
-| Day 5 总结 / 统计 | T10可选总结 / 统计 / 旧会话隔离自测与独立审查通过，待PR CI |
-| Day 6 体验 / 异常 | 未开始 |
-| Day 7 构建 / 设备验收 | T09在D:/yk-native编译Auth快照a1d3573；原生代码已通过，R8缺类修复中，暂无APK；不含T06 / T10 |
+| Day 3 高德选点 / 围栏 | T11首段PR #8已合并 / 部署，真实代理4项通过；UI已分派在隔离分支实现，设备定位待验 |
+| Day 4 打卡 / 补卡 | T08云验收已通过；T10客户端8项 / 独立审查 / 最终Web浏览器 / 两项CI通过，已合并PR #9 |
+| Day 5 总结 / 统计 | T10可选总结 / 统计 / 旧会话隔离已合并PR #9 |
+| Day 6 体验 / 异常 | T12任务卡已准备，完整围栏UI稳定后执行 |
+| Day 7 构建 / 设备验收 | T09实际release / APK静态核验及独审通过，配置待PR CI；Auth快照a1d3573不含T06 / T10 / T11，最终MVP另编 |
 
 ## 3. 验证证据
 
@@ -52,6 +53,7 @@ T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本已合并。T09原生代码�
 - T05：最终785包npm ci、lint / typecheck / 15Auth单测 / Expo匹配 / 无配置Web导出通过；真实UI登录 / 恢复 / 退出 / 失败重试通过，390 / 320可见网格无溢出及运行时异常。独立审查通过并重跑15单测 / typecheck，详见result / review。
 - T08：本地42组（旧24+新18）与独立重放全部通过，4个RPC审查无阻塞，PR #5已合并；真实PG17.11 / JWT / PostgREST云8组通过。独立连接实际观察实时2个、补卡4个后端争锁；释放后实时重放同一条、补卡1成功3冲突。临时2个身份与三表级联已清理，云脚本审查 / CI通过并合并PR #7。
 - T06：作者与独立审查均通过lint / typecheck / 8计划规则测试；作者真实云5组通过并清理临时身份。浏览器创建9–11数学 / 重载 / 编辑 / 重叠 / 软删 / 周切换 / 离线保留重试 / 旧周延迟响应通过，390 / 320无横向溢出。最终生产Web导出已由PR #6 CI通过；详见result / review。
+- T09：真实R8开启的ARM64 release于13分24秒构建成功；作者和独立审查均核验最终v2测试签名 / 权限 / Hermes / DEX / ZIP CRC / 许可。65,536,295 bytes，SHA256为3d073938717185380ac95d038e382bc2ab872ea975b5724e746601846f001324；副本位于D:/yanke-tools/artifacts/yanke-auth-compat-a1d3573-arm64-minified.apk。主控另扫207个APK资产 / DEX / 资源条目，未发现真实Web服务Key。
 - 真实注册 / 重置邮件送达、高德原生定位、GCJ-02实际来源、APK / iOS / 真机和启动耗时均未验证；T07管理员确认沙箱不代表邮件注册送达。
 
 ## 4. 本轮交付与保留项
@@ -77,8 +79,8 @@ T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本已合并。T09原生代码�
 - timegrid0.2.3/0.2.4发布包Context分裂，不能盲升；0.2.2保持精确固定，详见ADR-012。
 - T05当前npm audit为19 high、0 moderate、0 critical（braces / node-forge两条工具链根公告），不force降级Expo；旧T01的26项是当时结果，发布前复核当前锁文件。
 - 高德配置 / JS打包不等于原生可用；JDK17 / Android CLI / adb已验证，SDK37.0 / build-tools37及36 / NDK27.1 / CMake3.22.1已安装；Ninja260字符路径已修复，暂无已连接设备。Windows无本机iOS编译，EAS / Apple未验证。
-- 打卡直接客户端写被禁止；T08业务RPC和连续天数已云验证，UI未接入。T09快照无T06及后续功能，不能当作完整MVP候选。
-- T09原生代码越过长路径问题后编译通过，R8收缩阶段报告高德SDK缺com.amap.ams.gnss.GnssSoftLocator / net.jafama.FastMath；先用CLI关闭收缩产内部Auth包，正式R8及地图运行待验。SYSTEM_ALERT_WINDOW已授权通过源配置阻断并重生成，最终APK核验尚未完成。
+- 打卡直接客户端写被禁止；T08可信RPC与T10无围栏UI已交付。T09快照无T06及后续功能，不能当作完整MVP候选。
+- T09通过Expo插件精确补Jafama依赖及单类GNSS规则，真实R8 release已成功；独审核对实际mini/productId12跳过非mini软RTK分支，无全局忽略。最终APK已确认无悬浮窗 / 后台位置 / 位置前台服务 / 外部存储权限；设备地图运行仍未验。
 - 高德Web服务Key只放服务端，原生Key独立注入；仅一次前台定位，不存实际位置 / 轨迹。平台选择与本机填写说明见[高德配置](docs/amap-setup.md)。
 
 ## 7. 授权与接力
@@ -92,7 +94,7 @@ T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本已合并。T09原生代码�
 ## 8. 下一步
 
 1. 先读AGENTS、本文、DEVELOPMENT、agent-workflow，核对git status / log / PR，避免重复初始化或清理未知改动。
-2. T10冻结、自测与独立审查已通过；同步最新main保留T11模块和双方CI，再提交PR并验证，不清理未知文件。
+2. T10已合并；T11客户端在隔离分支实现，源码冻结后独审 / CI，保留已部署代理和双方检查，不清理未知文件。
 3. T08云脚本已合并PR #7；T10 / T11冻结后同步最新main，不用重复部署已一致的迁移或初始化T07。
-4. T11模块已合并部署，T10集成后新分支接高德POI / 前台定位UI；T09最小可复现配置修复冻结后独立审查并核验实际R8产物，最终源码另编MVP候选。
+4. T09配置独审通过并已集成最新main，待PR CI合并；T11客户端合并后执行T12，最终源码另编MVP候选。原生定位 / 邮件 / 启动性能以实际证据验收。
 5. 后续Agent自行处理CLI / 工具链安装，不把常规下载与排错退回用户。
