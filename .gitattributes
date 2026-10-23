@@ -1,0 +1,2 @@
+# Preserve upstream Jafama license whitespace verbatim, including its copyright notice.
+licenses/jafama-2.3.2.txt -text -whitespace

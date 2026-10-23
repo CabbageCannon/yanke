@@ -65,6 +65,12 @@
 
 `git diff --check` 通过。未提交 APK、生成原生目录、真实 Key、测试 keystore 或本机日志；未操作 Git index / commit / push。
 
+### 许可原文的单文件空白例外
+
+主控提交 `a668ee9` 后，完整提交差异检查发现许可文件第 27 行上游 fdlibm 版权原文带一个尾空格；此前工作区检查尚未包含当时 untracked 的许可文件，因此没有覆盖这一行。为保持已打包的上游声明逐字节一致，只在根 `.gitattributes` 对 `licenses/jafama-2.3.2.txt` 设置 `-whitespace` 并注明原因，同一路径使用 `-text` 防止后续 checkout 的换行转换；其他文件的检查和换行策略保持不变。
+
+验证：`git check-attr whitespace -- licenses/jafama-2.3.2.txt` 为 `unset`；明确启用 trailing-space / space-before-tab 后，完整 `a668ee9^..a668ee9` 差异检查通过。许可文件 SHA256 仍为 `4B5C97A02B1A2FE64A456A49F8AECA8EB5A9020E459728A828DDFD41F6A7F8CA`，仍与 APK 中的许可资产逐字节一致。没有修改许可原文、APK、构建配置或重编；本次仅新增属性例外与补充回报，已再次冻结，待独立审查。
+
 ## 待完成 / 未测
 
 本轮是 ARM64 Auth 兼容快照，后续计划 / 打卡页面不在候选中。已注入用户提供的原生高德 Key，但没有连接设备，安装 / 启动 / AppState / 定位 / 冷启动耗时未测；可编译也不能替代这些证据。Windows 没有本机 iOS 构建证据。

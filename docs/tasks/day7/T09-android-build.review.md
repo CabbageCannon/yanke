@@ -35,3 +35,10 @@
 
 - 本候选为 `a1d3573` Auth 快照加配置修复，不含后续计划 / 打卡 / 围栏 UI；主分支集成后需要另外构建业务候选。
 - 无连接设备；安装、启动、AppState、GCJ-02定位来源、真实围栏和启动耗时未验证。Windows 未做本机 iOS。
+
+## 许可空白属性补审
+
+- 补审对象：根 `.gitattributes` 的唯一规则 `licenses/jafama-2.3.2.txt -text -whitespace`，以及对应任务 / 回报修正。属性本身通过：精确限定单个许可文件；`git check-attr text whitespace` 对许可均为 unset，对应用配置、插件与说明文档均 unspecified，没有放宽其他文件。
+- 显式 `core.whitespace=trailing-space,space-before-tab` 检查 `a668ee9^..a668ee9` 完整差异退出0。此前工作区检查没覆盖 untracked 许可的范围说明已更正。
+- 工作区许可与最终 APK 资产仍逐字节一致：12,740 bytes，SHA256 `4B5C97A02B1A2FE64A456A49F8AECA8EB5A9020E459728A828DDFD41F6A7F8CA`。
+- **提交联动已闭合**：独立读取 `a668ee9:licenses/jafama-2.3.2.txt` 曾发现旧提交 blob 已被 Git 归一为 LF（12,508 bytes，SHA256 `E2ECF8B90E2075303978C6EEBE35F18C723D8330F492C31DBD4D5189359DB2AC`），单独提交属性不足以保留工作区 / APK 的 CRLF 字节。主控按新属性重新暂存后，审查者只读 `git show :licenses/jafama-2.3.2.txt`：暂存 blob 为12,740 bytes /4B5C97…，与工作区及 APK 许可资产逐字节一致；暂存 `.gitattributes` 仍只有该精确路径规则；显式 `core.whitespace=trailing-space,space-before-tab` 的 `git diff --cached --check` 退出0。补审通过，无剩余阻塞；无需重编APK，审查者未操作 index。

@@ -25,3 +25,4 @@
 - 授权必要可复现Expo config plugin、app.config.ts插件接线及最小第三方许可记录，精确添加net.jafama:jafama:2.3.2原生依赖。仅在确认软RTK可选边界 / 异常处理后为GnssSoftLocator添加单类dontwarn，不允许全局忽略高德 / net.jafama警告。
 - 禁止手补node_modules或仅改忽略的Gradle生成物。prebuild重复执行应保持依赖 / 规则幂等，随后真实minify=true release编译、签名 / 权限 / ABI / JS核验；插件与证据冻结后独立审查。
 - 若GNSS可选边界仍无证据，报告具体阻塞，不把窄规则当作运行验证。所有包仍是Auth兼容快照，地图定位与完整MVP候选另验。
+- 许可原文保留上游字节；若完整提交范围检查命中其原始空格，允许根.gitattributes仅对此许可路径设置whitespace例外并说明原因，不放宽其他文件、不修改已验证APK来处理排版。
