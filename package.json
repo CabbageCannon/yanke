@@ -15,7 +15,8 @@
     "typecheck": "tsc --noEmit",
     "test:auth": "node --test scripts/auth/verify.test.mjs",
     "test:plans": "node --test scripts/plans/verify.test.mjs",
-    "test:geofence": "node --test scripts/geofence/verify.test.mjs"
+    "test:geofence": "node --test scripts/geofence/verify.test.mjs",
+    "test:study": "node --test scripts/study/verify.test.mjs"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",

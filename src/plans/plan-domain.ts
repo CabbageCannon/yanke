@@ -11,6 +11,7 @@ export type Plan = {
   end_at: string;
   timezone: string;
   status: 'pending' | 'completed' | 'missed' | 'deleted';
+  summary: string | null;
   geofence_enabled: boolean;
   geofence_name: string | null;
 };
