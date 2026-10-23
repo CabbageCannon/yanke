@@ -4,11 +4,12 @@
 每阶段主控直接更新；详情看 docs/tasks/，方向决策看 docs/decisions.md。
 
 **更新**：2026-10-23，主控 Agent
-**阶段**：T06已合并PR #6；T10打卡 / 总结 / 统计客户端实现中，完整 MVP 尚未交付
+**阶段**：T10打卡 / 总结 / 统计客户端自测与独立审查通过，待PR CI；完整 MVP 尚未交付
 **本阶段分支**：codex/feat-study-loop-ui，基准main 45ff7f2；T08云脚本 / T09各在隔离worktree
 **账号阶段PR**：[PR #4](https://github.com/CabbageCannon/yanke/pull/4)两项CI通过，已合并5f6e465
 **打卡后端PR**：[PR #5](https://github.com/CabbageCannon/yanke/pull/5)已合并c74e16e；云迁移 / 8组真实RPC与并发通过，脚本已独立审查并经两项CI合并[PR #7](https://github.com/CabbageCannon/yanke/pull/7)为8ffeabf
 **计划阶段PR**：[PR #6](https://github.com/CabbageCannon/yanke/pull/6)两项CI通过，已合并45ff7f2，包含生产Web静态导出与8项计划测试
+**高德模块PR**：[PR #8](https://github.com/CabbageCannon/yanke/pull/8)独立审查 / 两项CI通过，已合并622b025；代理version2已部署，真实搜索20条与401 / 400检查通过，UI未接入
 **规则交付**：[PR #3](https://github.com/CabbageCannon/yanke/pull/3)已合并ad00493，无迟到宽限、总结可选
 **基础交付**：[PR #2](https://github.com/CabbageCannon/yanke/pull/2)已合并为991b1bb，PR与main两项CI均通过
 **前置规范提交**：PR #1 已通过 CI，合并为 b1bb007
@@ -20,7 +21,7 @@
 
 规范已先提交 GitHub，再通过子任务完成 Expo Router 空周网格与 Supabase 数据库基础。
 Expo58 / RN0.88 / React19.3；timegrid 精确固定0.2.2，高德模块2.3.1。
-T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本已合并；T06生产Web静态导出已由CI通过。T09替换校验后的官方Ninja1.13.2后原生代码编译通过，正处理高德组合SDK的R8缺类。T10客户端学习闭环收尾；T11高德独立模块首段已自测，独立审查中，UI尚未接入；尚无完整MVP。
+T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本已合并。T09原生代码编译通过，最小高德R8配置修复已进入实际构建。T10学习闭环源码冻结、自测与独立审查通过，待PR CI；T11高德首段已合并，代理部署并通过真实搜索，UI尚未接入；尚无完整MVP。
 
 ## 2. 任务快照
 
@@ -34,9 +35,9 @@ T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本已合并；T06生产Web静�
 | Day 1 原生定位 | 尚未交付，不得用JS打包替代 |
 | Day 2 计划CRUD | T06源码 / 5组真实云 / 浏览器 / 独立审查 / 两项CI通过，已合并PR #6 |
 | 云环境 / 会话 | T07真实云11组与独立审查通过，e03e92e已集成 |
-| Day 3 高德选点 / 围栏 | T11首段模块15组自测 / 独立审查通过，真实Auth定向3项通过；两Key已填，待PR / 部署 / 接UI与真实搜索 |
-| Day 4 打卡 / 补卡 | T08本地42组 / 独立审查 / PR #5及云8组通过，云脚本已合并PR #7；T10实现UI |
-| Day 5 总结 / 统计 | T10客户端实现中；RPC与基础view可用 |
+| Day 3 高德选点 / 围栏 | T11首段PR #8已合并 / 部署，真实代理4项通过；待接UI及设备前台定位 |
+| Day 4 打卡 / 补卡 | T08云验收已通过；T10客户端8项 / 独立审查 / 最终Web浏览器通过，待PR CI |
+| Day 5 总结 / 统计 | T10可选总结 / 统计 / 旧会话隔离自测与独立审查通过，待PR CI |
 | Day 6 体验 / 异常 | 未开始 |
 | Day 7 构建 / 设备验收 | T09在D:/yk-native编译Auth快照a1d3573；原生代码已通过，R8缺类修复中，暂无APK；不含T06 / T10 |
 
@@ -60,7 +61,8 @@ T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本已合并；T06生产Web静�
 - T00审查遗留的public高德Web Key输出和无lockfile跳过CI已清理。
 - 数据库子任务来自隔离分支，已集成；临时worktree已确认干净后用git worktree remove清理，ba9fb70与本地任务分支保留。
 - 服务端配置已安全保存在主目录忽略的.env.integration.local；UI沙箱凭据在.env.ui-sandbox.local，不提交 / 输出值，暂保留供T05 / T06验收。
-- T06 UI沙箱保留两条真实测试计划（政治 / 英语）及一条已软删记录；两个计划集成临时账号已删除。T06浏览器 / 8082预览均已停止。
+- T10当前UI沙箱保留本周6条非删除计划及历史软删记录；最终Web包真实读回正常60分钟、本周195 / 累计225、完成3/6，并通过退出后的旧响应隔离。详见T10 result，未新增云身份。
+- T11部署version2 / 默认网关JWT校验保留；真实ES256用户JWT搜索“中国国家图书馆”返回20条，缺 / 伪凭证401、空查询400。只上传Web服务Key，临时上传文件已删除，详见T11 deployment记录。
 
 ## 5. 已确认规则 / 缺少信息
 
@@ -90,7 +92,7 @@ T05 Auth、T06计划CRUD与T08 RPC / 云验收脚本已合并；T06生产Web静�
 ## 8. 下一步
 
 1. 先读AGENTS、本文、DEVELOPMENT、agent-workflow，核对git status / log / PR，避免重复初始化或清理未知改动。
-2. T06已合并；主目录T10新分支由子任务实现打卡 / 完成 / 统计UI，冻结后独立审查及适用CI，不清理未知文件。
+2. T10冻结、自测与独立审查已通过；同步最新main保留T11模块和双方CI，再提交PR并验证，不清理未知文件。
 3. T08云脚本已合并PR #7；T10 / T11冻结后同步最新main，不用重复部署已一致的迁移或初始化T07。
-4. T11模块审查通过后集成，再接高德POI / 前台定位UI与部署单函数；T09核对组合SDK后补可复现配置并验证R8，最终源码另编MVP候选。秘密缺口只阻塞依赖任务。
+4. T11模块已合并部署，T10集成后新分支接高德POI / 前台定位UI；T09最小可复现配置修复冻结后独立审查并核验实际R8产物，最终源码另编MVP候选。
 5. 后续Agent自行处理CLI / 工具链安装，不把常规下载与排错退回用户。

@@ -3,6 +3,8 @@ node_modules/
 expo-env.d.ts
 dist/
 web-build/
+output/
+.playwright-cli/
 ios/
 android/
 .kotlin/
