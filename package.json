@@ -15,7 +15,7 @@
     "typecheck": "tsc --noEmit",
     "test:auth": "node --test scripts/auth/verify.test.mjs",
     "test:plans": "node --test scripts/plans/verify.test.mjs",
-    "test:geofence": "node --test scripts/geofence/verify.test.mjs",
+    "test:geofence": "node --test scripts/geofence/verify.test.mjs scripts/geofence/plan-detail.test.mjs",
     "test:study": "node --test scripts/study/verify.test.mjs"
   },
   "dependencies": {

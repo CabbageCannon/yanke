@@ -16,8 +16,8 @@ export async function loadStudyPlan(client: SupabaseClient, userId: string, id: 
 }
 
 // Composite RPC results are PostgREST arrays unless single() requests an object.
-export async function checkInPlan(client: SupabaseClient, id: string): Promise<CheckIn> {
-  const { data, error } = await client.rpc('check_in_plan', { p_plan_id: id, p_geofence_verified: false }).single();
+export async function checkInPlan(client: SupabaseClient, id: string, geofenceVerified = false): Promise<CheckIn> {
+  const { data, error } = await client.rpc('check_in_plan', { p_plan_id: id, p_geofence_verified: geofenceVerified }).single();
   if (error) throw error;
   return data as CheckIn;
 }

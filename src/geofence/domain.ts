@@ -11,6 +11,14 @@ export type GeofenceFields = {
 };
 export const defaultGeofenceRadius = 200;
 
+export function geofenceFromFields(value: GeofenceFields): Geofence | null {
+  if (!value.geofence_enabled || value.geofence_name === null || value.geofence_lat === null ||
+      value.geofence_lng === null || value.geofence_radius === null) return null;
+  const geofence: Geofence = { name: value.geofence_name, latitude: value.geofence_lat,
+    longitude: value.geofence_lng, radius: value.geofence_radius, coordinateSystem: 'gcj02' };
+  return validateGeofence(geofence).ok ? geofence : null;
+}
+
 export function isGCJ02Coordinate(value: unknown): value is GCJ02Coordinate {
   if (!value || typeof value !== 'object') return false;
   const point = value as Partial<GCJ02Coordinate>;

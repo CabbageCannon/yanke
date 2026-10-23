@@ -1,8 +1,9 @@
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
+import type { GeofenceFields } from '../geofence/domain.ts';
 
 export const subjects = ['数学', '英语', '政治', '专业课', '其他'] as const;
 export type Subject = typeof subjects[number];
-export type Plan = {
+export type Plan = GeofenceFields & {
   id: string;
   user_id: string;
   subject: Subject;
@@ -12,8 +13,6 @@ export type Plan = {
   timezone: string;
   status: 'pending' | 'completed' | 'missed' | 'deleted';
   summary: string | null;
-  geofence_enabled: boolean;
-  geofence_name: string | null;
 };
 export type PlanDraft = { subject: Subject; title: string; date: string; start: string; end: string };
 export type PlanValues = Pick<Plan, 'subject' | 'title' | 'start_at' | 'end_at'>;

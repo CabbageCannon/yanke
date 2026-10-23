@@ -4,6 +4,8 @@ import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleShee
   Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { geofenceFromFields, validateGeofence, type Geofence } from '@/geofence/domain';
+import { GeofencePicker } from '@/geofence/geofence-picker';
 import type { SessionScope } from '@/lib/auth-session';
 import { theme } from '@/theme';
 import { deletePlan, savePlan } from './plan-data';
@@ -18,6 +20,8 @@ export function PlanEditor({ editor, client, scope, plans, onClose, onSaved }:
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [geofence, setGeofence] = useState<Geofence | null>(() => editor.plan ? geofenceFromFields(editor.plan) : null);
+  const [picking, setPicking] = useState(false);
   const pending = useRef(false);
   const mounted = useRef(true);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
@@ -30,13 +34,15 @@ export function PlanEditor({ editor, client, scope, plans, onClose, onSaved }:
   const submit = async (remove = false) => {
     if (pending.current || !scope.isCurrent()) return;
     if (!remove && !validation.ok) { setError(validation.error); return; }
+    const fenceValidation = validateGeofence(geofence);
+    if (!remove && !fenceValidation.ok) { setError(fenceValidation.error); return; }
     pending.current = true; setBusy(true); setError(null);
     try {
       if (remove) {
         const plan = await deletePlan(client, scope.userId, editor.id);
         if (mounted.current && scope.isCurrent()) onSaved(plan, '计划已删除。');
-      } else if (validation.ok) {
-        const { plan, overlap } = await savePlan(client, scope.userId, editor.id, validation.values,
+      } else if (validation.ok && fenceValidation.ok) {
+        const { plan, overlap } = await savePlan(client, scope.userId, editor.id, { ...validation.values, ...fenceValidation.fields },
           editor.timezone, !editor.plan);
         if (mounted.current && scope.isCurrent()) onSaved(plan,
           overlap ? '已保存，与其他计划重叠，可在计划列表中分别查看。' : '计划已保存。');
@@ -50,10 +56,12 @@ export function PlanEditor({ editor, client, scope, plans, onClose, onSaved }:
   };
 
   return (
-    <Modal visible transparent animationType="slide" onRequestClose={() => { if (!busy) onClose(); }}>
+    <Modal visible transparent animationType="slide" onRequestClose={() => { if (!busy) { if (picking) setPicking(false); else onClose(); } }}>
       <KeyboardAvoidingView style={styles.backdrop} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <SafeAreaView edges={['bottom', 'left', 'right']} style={styles.panel}>
           <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
+            {picking ? <GeofencePicker initial={geofence} client={client} scope={scope} onCancel={() => setPicking(false)}
+              onSelect={(value) => { setGeofence(value); setPicking(false); setError(null); }} /> : <>
             <View style={styles.row}>
               <Text accessibilityRole="header" style={styles.title}>{editor.plan ? '编辑计划' : '新建计划'}</Text>
               <Pressable accessibilityRole="button" disabled={busy} onPress={onClose} style={styles.textButton}>
@@ -89,7 +97,15 @@ export function PlanEditor({ editor, client, scope, plans, onClose, onSaved }:
             <Text style={styles.label}>标题（可选）</Text>
             <TextInput accessibilityLabel="计划标题" value={draft.title} onChangeText={(value) => change('title', value)}
               editable={!busy} style={styles.input} maxLength={100} placeholder="例如：高数第二章" />
-            {editor.plan?.geofence_enabled && <Text style={styles.helper}>已绑定地点：{editor.plan.geofence_name}</Text>}
+            <Text style={styles.label}>学习地点（可选）</Text>
+            <Text style={styles.helper}>{geofence ? `已绑定：${geofence.name} · ${geofence.radius}米` : '未绑定地点，实时打卡无需定位。'}</Text>
+            <View style={styles.row}>
+              <Pressable accessibilityRole="button" disabled={busy} style={styles.textButton} onPress={() => setPicking(true)}>
+                <Text style={styles.link}>{geofence ? '修改地点或半径' : '绑定学习地点'}</Text>
+              </Pressable>
+              {geofence && <Pressable accessibilityRole="button" disabled={busy} style={styles.textButton}
+                onPress={() => { setGeofence(null); setError(null); }}><Text style={styles.link}>移除围栏</Text></Pressable>}
+            </View>
             {overlapping && <Text style={styles.helper}>此时间与已有计划重叠，仍可保存；可在计划列表中分别查看。</Text>}
             {error && <Text accessibilityRole="alert" style={styles.error}>{error}</Text>}
             <Pressable accessibilityRole="button" disabled={busy} accessibilityState={{ disabled: busy, busy }}
@@ -113,6 +129,7 @@ export function PlanEditor({ editor, client, scope, plans, onClose, onSaved }:
                 </View>
               </View>
             ))}
+            </>}
           </ScrollView>
         </SafeAreaView>
       </KeyboardAvoidingView>
